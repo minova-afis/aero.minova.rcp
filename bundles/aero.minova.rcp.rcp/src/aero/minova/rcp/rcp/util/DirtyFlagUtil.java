@@ -116,12 +116,12 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 				if (Boolean.TRUE.equals(mfield.getValue().getBooleanValue())) {
 					return true;
 				}
-			} else if (mfield instanceof MParamStringField) {
-				if (!((MParamStringField) mfield).isNullValue()) { // Auch "leeren" ParamString Wert prüfen
+			} else if (mfield instanceof MParamStringField psf) {
+				if (!psf.isNullValue()) { // Auch "leeren" ParamString Wert prüfen
 					return true;
 				}
-			} else if (mfield instanceof MPeriodField) {
-				if (!((MPeriodField) mfield).isNullValue()) { // Auch "leeren" Period Wert prüfen
+			} else if (mfield instanceof MPeriodField pf) {
+				if (!pf.isNullValue()) { // Auch "leeren" Period Wert prüfen
 					return true;
 				}
 			} else if (mfield.getValue() != null) {
@@ -177,10 +177,10 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 		} else if (mField instanceof MBooleanField && value == null && Boolean.TRUE.equals(!mField.getValue().getBooleanValue())) {
 			// TableValue null ->Booleanfeld Wert soll false sein
 			return true;
-		} else if (mField instanceof MParamStringField && value == null && ((MParamStringField) mField).isNullValue()) {
+		} else if (mField instanceof MParamStringField psf && value == null && psf.isNullValue()) {
 			// Auch "leeren" ParamString Wert prüfen
 			return true;
-		} else if (mField instanceof MPeriodField && value == null && ((MPeriodField) mField).isNullValue()) {
+		} else if (mField instanceof MPeriodField pf && value == null && pf.isNullValue()) {
 			// Auch "leeren" Period Wert prüfen
 			return true;
 		}

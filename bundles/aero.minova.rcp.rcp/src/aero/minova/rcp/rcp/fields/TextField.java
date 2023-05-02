@@ -60,17 +60,7 @@ public class TextField {
 			}
 		});
 
-		text.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0) {
-				e.doit = true;
-			} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 262144) {
-				e.doit = false;
-				text.setText(text.getText() + "\t");
-				text.setSelection(text.getText().length());
-			} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
-				e.doit = true;
-			}
-		});
+		addTraverseListener(text);
 
 		text.setData(Constants.CONTROL_FIELD, field);
 		CssData cssData = new CssData(CssType.TEXT_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
@@ -85,6 +75,26 @@ public class TextField {
 
 		FieldLabel.layout(label, text, row, column, field.getNumberRowsSpanned());
 
+		addFormData(composite, field, row, column, text);
+
+		return text;
+	}
+
+	private static void addTraverseListener(Text text) {
+		text.addTraverseListener(e -> {
+			if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0) {
+				e.doit = true;
+			} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 262144) {
+				e.doit = false;
+				text.setText(text.getText() + "\t");
+				text.setSelection(text.getText().length());
+			} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
+				e.doit = true;
+			}
+		});
+	}
+
+	private static void addFormData(Composite composite, MField field, int row, int column, Text text) {
 		FormData fd = new FormData();
 		fd.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 
@@ -101,7 +111,5 @@ public class TextField {
 		}
 
 		text.setLayoutData(fd);
-
-		return text;
 	}
 }

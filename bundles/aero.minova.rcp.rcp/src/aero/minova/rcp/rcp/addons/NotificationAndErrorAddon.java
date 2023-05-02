@@ -81,7 +81,9 @@ public class NotificationAndErrorAddon {
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) ErrorObject et) {
 		String value = formatMessage(et);
 
-		value += "\n\nUser: " + et.getUser();
+		if (et.getUser() != null) {
+			value += "\n\nUser: " + et.getUser();
+		}
 		if (et.getProcedureOrView() != null) {
 			value += "\nProcedure/View: " + et.getProcedureOrView();
 		}

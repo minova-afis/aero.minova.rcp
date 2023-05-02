@@ -49,8 +49,7 @@ public class MinovaWizardPageEnterHelper {
 		}
 
 		// Wenn als letztes ein Popup Fenster offen war, dieses schließen und noch nicht speichern
-		if (((AbstractValueAccessor) currentField.getValueAccessor()).getControl() instanceof LookupComposite) {
-			LookupComposite l = (LookupComposite) ((AbstractValueAccessor) currentField.getValueAccessor()).getControl();
+		if (((AbstractValueAccessor) currentField.getValueAccessor()).getControl() instanceof LookupComposite l) {
 			l.closePopup();
 		}
 	}

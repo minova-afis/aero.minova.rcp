@@ -2,7 +2,7 @@
 <feature
       id="aero.minova.libs.feature"
       label="Feature Minova Libraries"
-      version="12.9.1.qualifier"
+      version="12.9.2.qualifier"
       provider-name="Minova Information Services GmbH">
 
    <description url="http://www.example.com/description">

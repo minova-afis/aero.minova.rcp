@@ -73,15 +73,14 @@ public class TraverseEnterHandler {
 
 		boolean popupOpen = false;
 
-		if (part.getObject() instanceof WFCDetailPart) {
-			MDetail mDetail = ((WFCDetailPart) part.getObject()).getDetail();
+		if (part.getObject() instanceof WFCDetailPart detailPart) {
+			MDetail mDetail = detailPart.getDetail();
 			if (((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl() != null) {
 				// aktuell selektiertes Feld holen
 				Control focussedControl = ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl();
 
 				// Ist ein Popup offen?
-				if (focussedControl instanceof LookupComposite) {
-					LookupComposite lookup = (LookupComposite) focussedControl;
+				if (focussedControl instanceof LookupComposite lookup) {
 					// Wir holen uns den Status des Popup des Lookup
 					popupOpen = lookup.popupIsOpen();
 				}
@@ -142,15 +141,14 @@ public class TraverseEnterHandler {
 
 		// Wir holen uns das MField des selektierten Felds.
 		Section fcSection = null;
-		if (focussedControl instanceof NatTable) {
+		if (focussedControl instanceof NatTable nattable) {
 			fcSection = (Section) focussedControl.getData(Constants.GRID_DATA_SECTION);
-			((NatTable) focussedControl).commitAndCloseActiveCellEditor();
+			nattable.commitAndCloseActiveCellEditor();
 		} else {
 			fcSection = ((SectionAccessor) ((MField) control.getData(Constants.CONTROL_FIELD)).getMSection().getSectionAccessor()).getSection();
 		}
 
-		if (focussedControl instanceof LookupComposite) {
-			LookupComposite lookup = (LookupComposite) focussedControl;
+		if (focussedControl instanceof LookupComposite lookup) {
 			// Wir holen uns den Status des Popup des Lookup
 			popupOpen = lookup.popupIsOpen();
 		}
@@ -160,8 +158,7 @@ public class TraverseEnterHandler {
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
 			focussedControl.setFocus();
-			if (focussedControl instanceof LookupComposite) {
-				LookupComposite lookup = (LookupComposite) focussedControl;
+			if (focussedControl instanceof LookupComposite lookup) {
 				lookup.closePopup();
 				MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
 				setLookupValue(field, lookup);
@@ -176,10 +173,8 @@ public class TraverseEnterHandler {
 				cellSelected = getNextRequiredNatTableCell(focussedControl, true);
 			}
 
-			LookupComposite lookup = null;
-			if (focussedControl instanceof LookupComposite) {
+			if (focussedControl instanceof LookupComposite lookup) {
 				MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
-				lookup = (LookupComposite) focussedControl;
 				if (popupOpen) {
 					setLookupValue(selectedField, lookup);
 				} else {
@@ -187,8 +182,7 @@ public class TraverseEnterHandler {
 				}
 			}
 
-			if (!cellSelected && focussedControl instanceof NatTable) {
-				NatTable natTable = (NatTable) focussedControl;
+			if (!cellSelected && focussedControl instanceof NatTable natTable) {
 				((SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER)).clear();
 			}
 
@@ -216,16 +210,13 @@ public class TraverseEnterHandler {
 				}
 
 				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl + 1));
-				if (fc == null && focussedControl instanceof LookupComposite) {
-					lookup = (LookupComposite) focussedControl;
+				if (fc == null && focussedControl instanceof LookupComposite lookup) {
 					lookup.closePopup();
 				}
 			}
 		} else {
-			LookupComposite lookup = null;
-			if (focussedControl instanceof LookupComposite) {
+			if (focussedControl instanceof LookupComposite lookup) {
 				MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
-				lookup = (LookupComposite) focussedControl;
 				if (popupOpen) {
 					setLookupValue(selectedField, lookup);
 				} else {
@@ -240,7 +231,7 @@ public class TraverseEnterHandler {
 				Control fc = getNextRequiredControl(tabList);
 
 				if (fc != null) {
-					if (focussedControl instanceof LookupComposite) {
+					if (focussedControl instanceof LookupComposite lookup) {
 						lookup = (LookupComposite) focussedControl;
 						lookup.closePopup();
 					}

@@ -778,7 +778,7 @@ public class DataService implements IDataService {
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromProcedure(String procedureName, MField field, Integer keyLong, String keyText,
 			boolean resolve, boolean useCache) {
 		List<LookupValue> list = new ArrayList<>();
-		String hashName = CacheUtil.getNameList(field);
+		String hashName = resolve && !field.isUseResolveParms() ? procedureName : CacheUtil.getNameList(field);
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
