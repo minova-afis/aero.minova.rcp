@@ -54,6 +54,7 @@ public abstract class MField {
 	private boolean keyTypeUser = false;
 	private boolean labelText;
 	private boolean useResolveParms = false;
+	private boolean filterLastAction = true;
 	private String defaultValueString;
 
 	protected MField(DataType dataType) {
@@ -543,6 +544,14 @@ public abstract class MField {
 		if (getValueAccessor() != null) {
 			valueAccessor.setTooltip(tooltip);
 		}
+	}
+
+	public boolean isFilterLastAction() {
+		return filterLastAction;
+	}
+
+	public void setFilterLastAction(boolean filterLastAction) {
+		this.filterLastAction = filterLastAction;
 	}
 
 }

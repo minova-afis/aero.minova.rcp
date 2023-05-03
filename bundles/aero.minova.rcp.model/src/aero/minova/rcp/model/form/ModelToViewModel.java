@@ -77,6 +77,7 @@ public class ModelToViewModel {
 			f.setLookupProcedurePrefix(field.getLookup().getProcedurePrefix());
 			f.setUseResolveParms(field.getLookup().isUseResolveParams());
 			f.setLookupDescription(field.getLookup().getDescriptionName());
+			f.setFilterLastAction(field.getLookup().isFilterLastAction());
 			for (TypeParam typeParam : field.getLookup().getParam()) {
 				f.addLookupParameter(typeParam.getFieldName());
 			}
