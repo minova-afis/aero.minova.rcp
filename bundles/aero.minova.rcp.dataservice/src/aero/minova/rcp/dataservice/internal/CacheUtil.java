@@ -8,7 +8,7 @@ public class CacheUtil {
 
 	public static String getNameList(MField field) {
 		if (field.getLookupParameters() == null) {
-			return field.getLookupProcedurePrefix();
+			return field.getLookupProcedurePrefix() != null ? field.getLookupProcedurePrefix() : "";
 		}
 
 		StringBuilder hashName = new StringBuilder(field.getLookupProcedurePrefix() + "[");
