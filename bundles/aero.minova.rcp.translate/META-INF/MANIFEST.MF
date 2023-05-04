@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: WFC Translation Service
 Bundle-SymbolicName: aero.minova.rcp.translate;singleton:=true
-Bundle-Version: 12.9.3.qualifier
+Bundle-Version: 12.9.4.qualifier
 Bundle-Vendor: MINOVA
 Require-Bundle: org.eclipse.e4.core.services,
  javax.inject,
