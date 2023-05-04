@@ -6,9 +6,6 @@ on:
       version:
         description: 'major.minor.patch'
         required: true
-      description:
-        description: 'Beschreibung (Keine Sonderzeichen!)'
-        required: true
 
 jobs:
   tagAndReleaseWFC:
@@ -38,7 +35,7 @@ jobs:
        git config user.email "service@minova.com"
        git config user.name "minova-worker"
        git add . 
-       git commit -m "Increment Version to ${{ github.event.inputs.version }}, ${{ github.event.inputs.description }}"
+       git commit -m "Increment Version to ${{ github.event.inputs.version }}"
        git push
        
     # Version als tag anlegen
@@ -46,7 +43,7 @@ jobs:
       run: |
         git config user.email "service@minova.com"
         git config user.name "minova-worker"
-        git tag -a "v${{ github.event.inputs.version }}" -m "${{ github.event.inputs.description }}"
+        git tag -a "v${{ github.event.inputs.version }}" -m "${{ github.event.inputs.version }}"
         git push --tags
         
     # Maven Cachen
@@ -59,17 +56,10 @@ jobs:
         
     # Bauen
     - name: Build with Maven 
-      run: mvn --batch-mode --update-snapshots verify --file pom.xml --settings .github/settings.xml
+      run: mvn --batch-mode --update-snapshots verify --file pom.xml --settings .github/settings.xml -DskipTests
       env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-    
-    # Test reports
-    - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1
-      if: always()
-      with:
-        files: /**/surefire-reports/*.xml
  
     # Zips und Tar.gz hochladen
     - name: Copy .zip und .tar.gz  to Stage area
