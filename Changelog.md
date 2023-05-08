@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+## [12.9.4] - 04.05.2023
+
 ### Änderung
 - Lookups: Bei Resolve NIE nach LastAction filtern; bei List wie in Maske angegeben (betrifft Lookups über Prozeduren und Tabellen/Views)
 
