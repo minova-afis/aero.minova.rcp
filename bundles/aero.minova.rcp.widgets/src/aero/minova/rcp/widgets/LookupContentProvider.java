@@ -8,12 +8,10 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.translation.TranslationService;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
-import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.util.WildcardMatcher;
 
@@ -26,8 +24,9 @@ public class LookupContentProvider {
 	@Inject
 	private TranslationService translationService;
 
-	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupcontentprovider"));
 	private String tableName;
+
+	private Comparator<LookupValue> customComparator;
 
 	public LookupContentProvider(String tableName) {
 		this.tableName = tableName;
@@ -43,9 +42,6 @@ public class LookupContentProvider {
 	public List<LookupValue> getContent(final String entry) {
 		MLookupField mField = (MLookupField) lookup.getData(Constants.CONTROL_FIELD);
 		mField.setWrittenText(entry);
-		if (LOG) {
-			System.out.println("Entry:[" + entry + "]");
-		}
 
 		WildcardMatcher matcher = new WildcardMatcher(entry.toUpperCase());
 		List<LookupValue> result = values.stream()
@@ -64,8 +60,12 @@ public class LookupContentProvider {
 			}
 		}
 
-		// Groß- und Kleinschreibung ignorieren, bei entry == Matchcode dieses Element an erste Stelle, siehe #1086
-		result.sort(new SortIgnoreCase(entry));
+		if (getCustomComparator() == null) {
+			// Default wenn kein Comparator gesetzt: Groß- und Kleinschreibung ignorieren, bei entry == Matchcode dieses Element an erste Stelle, siehe #1086
+			result.sort(new SortIgnoreCase(entry));
+		} else {
+			result.sort(getCustomComparator());
+		}
 		return result;
 	}
 
@@ -87,25 +87,14 @@ public class LookupContentProvider {
 		this.lookup = lookup;
 	}
 
-	public void setTable(Table table) {
-		values.clear();
-		values.addAll(table.getRows().stream().map(r -> {
-			int keyLong = r.getValue(0).getIntegerValue();
-			String keyText = r.getValue(1) == null ? "" : r.getValue(1).getStringValue();
-			String description = r.getValue(2) == null ? "" : r.getValue(2).getStringValue();
-			return new LookupValue(keyLong, keyText, description);
-		}).sorted((lv1, lv2) -> lv1.compareTo(lv2)).collect(Collectors.toList()));
-		lookup.valuesUpdated();
-	}
-
 	public void setValuesOnly(List<LookupValue> values) {
 		this.values.clear();
-		this.values.addAll(values.stream().sorted((lv1, lv2) -> lv1.compareTo(lv2)).collect(Collectors.toList()));
+		this.values.addAll(values.stream().sorted((lv1, lv2) -> lv1.compareTo(lv2)).toList());
 	}
 
 	public void setValues(List<LookupValue> values) {
 		this.values.clear();
-		this.values.addAll(values.stream().sorted((lv1, lv2) -> lv1.compareTo(lv2)).collect(Collectors.toList()));
+		this.values.addAll(values.stream().sorted((lv1, lv2) -> lv1.compareTo(lv2)).toList());
 		lookup.valuesUpdated();
 	}
 
@@ -121,7 +110,15 @@ public class LookupContentProvider {
 		this.filter = filter;
 	}
 
-	public class SortIgnoreCase implements Comparator<Object> {
+	public Comparator<LookupValue> getCustomComparator() {
+		return customComparator;
+	}
+
+	public void setCustomComparator(Comparator<LookupValue> customComparator) {
+		this.customComparator = customComparator;
+	}
+
+	public class SortIgnoreCase implements Comparator<LookupValue> {
 		private String entry;
 
 		public SortIgnoreCase(String entry) {
@@ -129,9 +126,9 @@ public class LookupContentProvider {
 		}
 
 		@Override
-		public int compare(Object o1, Object o2) {
-			String s1 = ((LookupValue) o1).keyText;
-			String s2 = ((LookupValue) o2).keyText;
+		public int compare(LookupValue o1, LookupValue o2) {
+			String s1 = o1.keyText;
+			String s2 = o2.keyText;
 
 			// Bei genauer Übereinstimmung des Matchcodes Element an erste Stelle setzten, siehe #1086
 			if (s1.equalsIgnoreCase(entry)) {
