@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.accessor;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -166,5 +167,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	@Override
 	public void setFilterForLookupContentProvider(Predicate<LookupValue> filter) {
 		((LookupComposite) control).getContentProvider().setFilter(filter);
+	}
+
+	@Override
+	public void setComparatorForLookupContentProvider(Comparator<LookupValue> comparator) {
+		((LookupComposite) control).getContentProvider().setCustomComparator(comparator);
 	}
 }

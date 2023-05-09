@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.accessor;
 
+import java.util.Comparator;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -148,6 +149,11 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Override
 	public void setFilterForLookupContentProvider(Predicate<LookupValue> filter) {
+		// Tut nichts für Felder außer Lookups, ist im LookupValueAccessor überschrieben
+	}
+
+	@Override
+	public void setComparatorForLookupContentProvider(Comparator<LookupValue> comparator) {
 		// Tut nichts für Felder außer Lookups, ist im LookupValueAccessor überschrieben
 	}
 

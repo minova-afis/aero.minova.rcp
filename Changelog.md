@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Änderung
+- Lookups die Möglichkeit geben, die Einträge über einen Helper zu sortieren 
+
 ## [12.9.4] - 04.05.2023
 
 ### Änderung
