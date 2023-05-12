@@ -117,7 +117,7 @@ public class DataFormService implements IDataFormService {
 		for (Object o : form.getDetail().getHeadAndPageAndGrid()) {
 			if (o instanceof Head head) {
 				List<Object> fields = head.getFieldOrGrid();
-				allFields = filterAndSortFields(fields);
+				allFields.addAll(filterAndSortFields(fields));
 			} else if (o instanceof Page page) {
 				List<Object> fields = page.getFieldOrGrid();
 				allFields.addAll(filterAndSortFields(fields));
