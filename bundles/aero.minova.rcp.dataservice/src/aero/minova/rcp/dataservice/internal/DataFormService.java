@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
@@ -99,13 +98,8 @@ public class DataFormService implements IDataFormService {
 		}
 		tablename += form.getDetail().getProcedureSuffix();
 		dataTable.setName(tablename);
-		List<Field> allFields = null;
-		allFields = getFieldsFromForm(form);
 
-		// Sortierung der Felder nach sql-index oder der Reihe nach!
-		allFields = allFields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).filter(f -> f.getSqlIndex().intValue() >= 0)
-				.collect(Collectors.toList());
-		for (Field f : allFields) {
+		for (Field f : getFieldsFromForm(form)) {
 			dataTable.addColumn(createColumnFromField(f, prefix));
 			if (f.getQuantity() != null) {
 				Field qF = new Field();
@@ -121,17 +115,15 @@ public class DataFormService implements IDataFormService {
 	public List<Field> getFieldsFromForm(Form form) {
 		List<Field> allFields = new ArrayList<>();
 		for (Object o : form.getDetail().getHeadAndPageAndGrid()) {
-			if (o instanceof Head) {
-				Head head = (Head) o;
+			if (o instanceof Head head) {
 				List<Object> fields = head.getFieldOrGrid();
-				allFields = filterFields(fields);
-			} else if (o instanceof Page) {
-				Page page = (Page) o;
+				allFields = filterAndSortFields(fields);
+			} else if (o instanceof Page page) {
 				List<Object> fields = page.getFieldOrGrid();
-				allFields.addAll(filterFields(fields));
+				allFields.addAll(filterAndSortFields(fields));
 			}
 		}
-		return allFields;
+		return filterAndSortFields(allFields);
 	}
 
 	@Override
@@ -145,18 +137,16 @@ public class DataFormService implements IDataFormService {
 		return keyFields;
 	}
 
-	public List<Field> filterFields(List<Object> objects) {
+	public List<Field> filterAndSortFields(List<? extends Object> objects) {
 		List<Field> fields = new ArrayList<>();
 		for (Object o : objects) {
-			if (o instanceof Field) {
-				Field f = (Field) o;
+			if (o instanceof Field f) {
 				fields.add(f);
 			}
 		}
 
 		// Nach SQL-Index sortieren und nur Felder mit SQL-Index >= 0 zurückgeben
-		fields = fields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).filter(f -> f.getSqlIndex().intValue() >= 0).collect(Collectors.toList());
-		return fields;
+		return fields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).filter(f -> f.getSqlIndex().intValue() >= 0).toList();
 	}
 
 	@Override
