@@ -4,9 +4,16 @@
 # https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
+registries:
+  maven-github:
+    type: maven-repository
+    url: https://maven.pkg.github.com/minova-afis
+    username: ${{secrets.MAIN_GITHUB_RELEASE_USERNAME}}
+    password: ${{secrets.MAIN_GITHUB_RELEASE_TOKEN}}
 updates:
   - package-ecosystem: "maven"
     directory: "/"
+    registries: "*"
     schedule:
       interval: "daily"
     assignees:
