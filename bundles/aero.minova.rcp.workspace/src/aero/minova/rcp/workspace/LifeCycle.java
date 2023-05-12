@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
+import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -54,6 +55,9 @@ public class LifeCycle {
 
 	@Inject
 	IDataService dataService;
+
+	@Inject
+	IApplicationContext applicationContext;
 
 	String defaultConnectionString;
 
@@ -105,7 +109,7 @@ public class LifeCycle {
 
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
-			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null);
+			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null, applicationContext);
 			workspaceDialog.setDefaultConnectionString(defaultConnectionString);
 
 			if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData().isEmpty()) {
@@ -189,7 +193,7 @@ public class LifeCycle {
 
 			dataService.setCredentials(username, pw, url, workspaceLocation);
 		} catch (WorkspaceException e) {
-			WorkspaceDialog defaultDialog = new WorkspaceDialog(null, sPrefs.name());
+			WorkspaceDialog defaultDialog = new WorkspaceDialog(null, applicationContext, sPrefs.name());
 			defaultDialog.setDefaultConnectionString(defaultConnectionString);
 			workspaceLocation = loadWorkspaceConfigManually(defaultDialog, workspaceLocation);
 		}

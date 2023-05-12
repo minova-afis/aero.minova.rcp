@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -33,6 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
+import aero.minova.rcp.util.OSUtil;
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
@@ -41,7 +43,6 @@ public class WorkspaceDialog extends Dialog {
 	private Text username;
 	private Text password;
 	private Text applicationArea;
-	private Button btnOK;
 	private Button btnDefault;
 	private Text message;
 	private Text connectionString;
@@ -56,13 +57,15 @@ public class WorkspaceDialog extends Dialog {
 
 	private boolean loadedProfile = false;
 	private String defaultConnectionString;
+	private IApplicationContext applicationContext;
 
-	public WorkspaceDialog(Shell parentShell) {
+	public WorkspaceDialog(Shell parentShell, IApplicationContext applicationContext) {
 		super(parentShell);
+		this.applicationContext = applicationContext;
 	}
 
-	public WorkspaceDialog(Shell parentShell, String profileName) {
-		this(parentShell);
+	public WorkspaceDialog(Shell parentShell, IApplicationContext applicationContext, String profileName) {
+		this(parentShell, applicationContext);
 		this.profileName = profileName;
 	}
 
@@ -241,7 +244,7 @@ public class WorkspaceDialog extends Dialog {
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
+		Button btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
 		btnOK.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -295,4 +298,14 @@ public class WorkspaceDialog extends Dialog {
 	public void setDefaultConnectionString(String defaultConnectionString) {
 		this.defaultConnectionString = defaultConnectionString;
 	}
+
+	@Override
+	public int open() {
+		if (OSUtil.isLinux()) {
+			// Unter Linux den Splash-Screen sofort schließen, siehe #1487
+			applicationContext.applicationRunning();
+		}
+		return super.open();
+	}
+
 }
