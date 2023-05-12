@@ -18,7 +18,8 @@ registries:
 updates:
   - package-ecosystem: "maven"
     directory: "/"
-    registries: "*"
+    registries: 
+       - maven-github
     schedule:
       interval: "daily"
     assignees:
@@ -26,6 +27,8 @@ updates:
       - "janiak-minova"
   - package-ecosystem: "github-actions"
     directory: "/"
+    registries:
+      - github
     schedule:
       interval: "daily"
     assignees:
