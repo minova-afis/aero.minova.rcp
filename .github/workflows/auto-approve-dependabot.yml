@@ -1,6 +1,0 @@
-#name: Dependabot auto approve
-#on: pull_request_target
-#jobs:
-#  Approve:
-#   uses: minova-afis/aero.minova.github.workflows/.github/workflows/auto-merge-dependabot.yml@main
-#    secrets: inherit
