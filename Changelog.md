@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Änderung
 - Lookups die Möglichkeit geben, die Einträge über einen Helper zu sortieren 
+- Unter Linux den Spashscreen schließen, sobald Login-Dialog öffnet, damit Dialog nicht vom Splash überdeckt wird
 
 ## [12.9.4] - 04.05.2023
 
