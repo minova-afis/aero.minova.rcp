@@ -4,12 +4,13 @@ import static org.eclipse.jface.widgets.WidgetFactory.label;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -203,16 +204,19 @@ public class WorkspaceDialog extends Dialog {
 	}
 
 	/**
-	 * Füllt die ComboBox mit den vorhandenen Profilen
+	 * Füllt die ComboBox mit den vorhandenen Profilen in alphabetischer Reihenfolge
 	 */
 	private void fillProfiles() {
-		for (ISecurePreferences prefs : WorkspaceAccessPreferences.getSavedWorkspaceAccessData()) {
+		List<String> prefNames = WorkspaceAccessPreferences.getSavedWorkspaceAccessData().stream().map(pref -> {
 			try {
-				profile.add(prefs.get(WorkspaceAccessPreferences.PROFILE, ""));
-			} catch (StorageException e1) {
-				logger.error(e1.getMessage(), e1);
+				return pref.get(WorkspaceAccessPreferences.PROFILE, "");
+			} catch (StorageException e) {
+				logger.error(e.getMessage(), e);
+				return "";
 			}
-		}
+		}).toList();
+
+		prefNames.stream().sorted(Comparator.comparing(String::toString, String.CASE_INSENSITIVE_ORDER)).forEach(s -> profile.add(s));
 	}
 
 	/**
