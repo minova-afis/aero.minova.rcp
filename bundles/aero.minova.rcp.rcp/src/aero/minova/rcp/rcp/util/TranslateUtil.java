@@ -97,7 +97,7 @@ public class TranslateUtil {
 	 * Beispiel <br>
 	 * Eingabge String: "@msg.TextTooLong %110>100" <br>
 	 * Übersetzung in messagesProperties: "Maximale L\u00E4nge \u00FCberschritten ({0})" <br>
-	 * Rückgabewert dieser Methode: "Maximale Lange überschritten (110>100)"
+	 * Rückgabewert dieser Methode: "Maximale Länge überschritten (110>100)"
 	 * 
 	 * @param errorMessage
 	 * @param translationService
