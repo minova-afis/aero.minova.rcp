@@ -19,6 +19,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Unter Linux den Spashscreen schließen, sobald Login-Dialog öffnet, damit Dialog nicht vom Splash überdeckt wird
 - Profile im Login-Dialog alphabetisch sortiert anzeigen
 
+### Bugfixes
+- ValueChangeEvent#isUser von ParamString-Feldern korrekt setzten
+
 ## [12.9.4] - 04.05.2023
 
 ### Änderung
