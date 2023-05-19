@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Änderung
+- Aussagekräftige Fehlermeldung anzeigen, wenn eine Maske für ein ParamString Feld nicht gefunden werden konnte (Übersetzung ab i18n 12.16.0)
+
 ## [12.9.5] - 19.05.2023
 
 ### Änderung

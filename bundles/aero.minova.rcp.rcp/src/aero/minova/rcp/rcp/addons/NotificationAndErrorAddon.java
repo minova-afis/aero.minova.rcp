@@ -29,6 +29,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
+import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.widgets.MinovaNotifier;
 
@@ -64,7 +65,8 @@ public class NotificationAndErrorAddon {
 		if (!translate.startsWith("@")) {
 			translate = "@" + translate;
 		}
-		return translationService.translate(translate, null);
+
+		return TranslateUtil.translateWithParameters(translate, translationService);
 	}
 
 	@Inject
