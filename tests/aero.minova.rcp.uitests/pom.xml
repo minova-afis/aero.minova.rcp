@@ -4,14 +4,14 @@
 
     <groupId>aero.minova.rcp</groupId>
     <artifactId>aero.minova.rcp.uitests</artifactId>
-    <version>12.9.4-SNAPSHOT</version>
+    <version>12.9.5-SNAPSHOT</version>
 
     <packaging>eclipse-test-plugin</packaging>
 
     <parent>
         <groupId>aero.minova.rcp</groupId>
         <artifactId>aero.minova.rcp.tests</artifactId>
-        <version>12.9.4-SNAPSHOT</version>
+        <version>12.9.5-SNAPSHOT</version>
     </parent>
 
     <properties>
