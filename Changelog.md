@@ -20,6 +20,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Profile im Login-Dialog alphabetisch sortiert anzeigen
 
 ### Bugfixes
+- ValueChangeEvent#isUser von ParamString-Feldern korrekt setzten
 - Fehler beim Laden von Grids ausbessern, hat Grids betroffen, die in der xbs eine Verknüpfung zu einem nicht-primary-key Feld enthalten haben
 
 ## [12.9.4] - 04.05.2023
