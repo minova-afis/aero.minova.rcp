@@ -1161,26 +1161,36 @@ public class WFCDetailCASRequestsUtil {
 
 		if (formName != null) {
 			Form f = dataFormService.getForm(formName);
-			for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
-				List<Object> fieldsOrGrids = new ArrayList<>();
 
-				if (o instanceof Head h) {
-					fieldsOrGrids = h.getFieldOrGrid();
-				} else if (o instanceof Page p) {
-					fieldsOrGrids = p.getFieldOrGrid();
-				}
-
-				for (Object fieldOrGrid : fieldsOrGrids) {
-					if (fieldOrGrid instanceof Field field) {
-						subfields.add(field);
-					}
-				}
+			if (f == null) {
+				broker.send(Constants.BROKER_SHOWERRORMESSAGE, "@msg.FormForParamStringNotFound %" + formName);
+				return;
 			}
+
+			getSubFields(subfields, f);
 		}
 
 		mParamString.getSubFields().clear();
 		mParamString.getSubFields().addAll(subfields);
 		redrawSection(mParamString.getMSection());
+	}
+
+	private void getSubFields(List<Field> subfields, Form f) {
+		for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
+			List<Object> fieldsOrGrids = new ArrayList<>();
+
+			if (o instanceof Head h) {
+				fieldsOrGrids = h.getFieldOrGrid();
+			} else if (o instanceof Page p) {
+				fieldsOrGrids = p.getFieldOrGrid();
+			}
+
+			for (Object fieldOrGrid : fieldsOrGrids) {
+				if (fieldOrGrid instanceof Field field) {
+					subfields.add(field);
+				}
+			}
+		}
 	}
 
 	private void updateGridLookupValues() {
