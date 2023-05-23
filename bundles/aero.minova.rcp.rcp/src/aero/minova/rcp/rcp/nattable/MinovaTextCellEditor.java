@@ -14,7 +14,6 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.IContentProposalListener2;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
-import org.eclipse.nebula.widgets.nattable.data.convert.ConversionFailedException;
 import org.eclipse.nebula.widgets.nattable.data.convert.IDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.config.RenderErrorHandling;
@@ -692,14 +691,10 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 
 			// if the conversion succeeded, remove error rendering if exists
 			conversionErrorHandler.removeError(this);
-		} catch (ConversionFailedException e) {
-			// conversion failed, return null!
-			conversionErrorHandler.displayError(this, e);
-			return null;
 		} catch (Exception e) {
-			// conversion failed
-			conversionErrorHandler.displayError(this, e);
-			throw new ConversionFailedException(e.getMessage(), e);
+			// conversion failed, return null!
+			conversionErrorHandler.displayError(this, configRegistry, e);
+			return null;
 		}
 		return canonicalValue;
 	}
