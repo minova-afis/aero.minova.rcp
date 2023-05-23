@@ -90,8 +90,8 @@ public class AboutDialog extends TitleAreaDialog {
 
 		Image home = resManager.createImage(ImageUtil.getImageDefault("home.png"));
 		createText(info, home, "MINOVA Information Services GmbH", lizenzFont, IMessageProvider.INFORMATION);
-		createText(info, null, "Tröltschstraße 4", lizenzFont, IMessageProvider.INFORMATION);
-		createText(info, null, "97072 Würzburg", lizenzFont, IMessageProvider.INFORMATION);
+		createText(info, null, "Leightonstraße 2", lizenzFont, IMessageProvider.INFORMATION);
+		createText(info, null, "97074 Würzburg", lizenzFont, IMessageProvider.INFORMATION);
 		createText(info, null, "AG Würzburg HRB 7625", lizenzFont, IMessageProvider.INFORMATION);
 
 		Image phone = resManager.createImage(ImageUtil.getImageDefault("phone.png"));

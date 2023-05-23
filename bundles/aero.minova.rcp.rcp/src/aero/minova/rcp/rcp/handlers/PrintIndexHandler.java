@@ -519,8 +519,8 @@ public class PrintIndexHandler {
 		xml.append("""
 				<Site>
 				<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>
-				<Address2><![CDATA[Tröltschstraße 4]]></Address2>
-				<Address3><![CDATA[97072 Würzburg]]></Address3>
+				<Address2><![CDATA[Leightonstraße 2]]></Address2>
+				<Address3><![CDATA[97074 Würzburg]]></Address3>
 				<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>
 				<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>
 				<Application>WFC</Application>
