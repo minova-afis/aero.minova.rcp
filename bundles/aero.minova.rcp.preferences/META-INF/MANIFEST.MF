@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Preferences
 Bundle-SymbolicName: aero.minova.rcp.preferences
-Bundle-Version: 12.9.5.qualifier
+Bundle-Version: 12.9.6.qualifier
 Automatic-Module-Name: aero.minova.rcp.preferences
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.equinox.security,
