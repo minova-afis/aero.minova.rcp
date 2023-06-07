@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+## [12.9.6] - 07.06.2023
+
 ### Änderung
 - Aussagekräftige Fehlermeldung anzeigen, wenn eine Maske für ein ParamString Feld nicht gefunden werden konnte (Übersetzung ab i18n 12.16.0)
 - Minova-Adresse aktualisieren
