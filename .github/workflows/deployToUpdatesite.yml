@@ -18,7 +18,7 @@ jobs:
     - name: Checkout aero.minova.rcp
       uses: actions/checkout@v2
 
-    - uses: actions/setup-java@v2
+    - uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'adopt'
