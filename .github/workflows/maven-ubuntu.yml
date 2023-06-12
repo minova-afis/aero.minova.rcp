@@ -72,7 +72,7 @@ jobs:
           SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
 
       - name: Store report of Dependency Check
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: dependency-check-report.html
           path: target/dependency-check-report.html
