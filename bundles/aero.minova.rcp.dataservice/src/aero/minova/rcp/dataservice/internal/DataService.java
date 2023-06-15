@@ -97,7 +97,7 @@ public class DataService implements IDataService {
 	private int minTimeBetweenError = 3;
 	Map<String, Long> timeOfLastErrorMessage = new HashMap<>();
 
-	private static final FilterValue fv = new FilterValue(">", "0", "");
+	private static final FilterValue fv = new FilterValue(">", 0, "");
 
 	private static final boolean LOG_CACHE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
 	private static final boolean LOG_SQL_STRING = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/logsqlstring"));
