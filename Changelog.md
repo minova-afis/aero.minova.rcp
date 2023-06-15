@@ -15,7 +15,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Bugfixes
+- Verhindern, dass alle Profile auf einmal gelöscht werden können
 - Bei Lookups mit Tabellen/Views die LastAction als Integer schicken. Wichtig für Postgres-Datenbanken, da hier der Dateityp genau passen muss.
+
 
 ## [12.9.6] - 07.06.2023
 
