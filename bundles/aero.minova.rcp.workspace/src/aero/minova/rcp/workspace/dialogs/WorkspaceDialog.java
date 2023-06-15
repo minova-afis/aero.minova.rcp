@@ -122,7 +122,15 @@ public class WorkspaceDialog extends Dialog {
 		deleteProfile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText());
+
+				String profileNameToDelete = profile.getText();
+				logger.info("Deleting Profile \"" + profileNameToDelete + "\"");
+				if (profileNameToDelete == null || profileNameToDelete.isBlank()) {
+					logger.info("No profile selected, not deleting");
+					return;
+				}
+
+				WorkspaceAccessPreferences.deleteSavedWorkspace(profileNameToDelete);
 				try {
 					// Workspace Ordner löschen
 					FileUtils.deleteDirectory(new File(applicationArea.getText().replace("file:", "")));

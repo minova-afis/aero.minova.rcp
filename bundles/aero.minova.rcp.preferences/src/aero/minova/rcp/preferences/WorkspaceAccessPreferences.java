@@ -66,6 +66,12 @@ public class WorkspaceAccessPreferences {
 				.node(WORKSPACES);
 		if (workspaces.nodeExists(name)) {
 			ISecurePreferences node = workspaces.node(name);
+
+			if (node.childrenNames().length > 0) {
+				logger.error("Node \"" + name + "\" has Children, not deleting");
+				return;
+			}
+
 			node.clear();
 			node.removeNode();
 			try {
