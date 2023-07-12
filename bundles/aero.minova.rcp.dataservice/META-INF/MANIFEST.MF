@@ -23,9 +23,9 @@ Require-Bundle: org.eclipse.e4.core.services,
 Export-Package: aero.minova.rcp.dataservice,
  aero.minova.rcp.dataservice.internal
 Bundle-ActivationPolicy: lazy
+Import-Package: javax.xml.bind
 Service-Component: OSGI-INF/aero.minova.rcp.dataservice.internal.DataFormService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.DataService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaImageService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaJsonService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaPluginService.xml
-Import-Package: javax.xml.bind
