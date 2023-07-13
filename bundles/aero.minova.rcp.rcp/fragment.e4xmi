@@ -322,12 +322,15 @@
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnurbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@Action.Save" iconURI="platform:/plugin/aero.minova.rcp.images/images/SaveRecord.Command/32x32.png" tooltip="@Action.Save" command="_laMxurbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
+        <visibleWhen xsi:type="ui:ImperativeExpression" xmi:id="_6Qeo0CGOEe6YuKiWIJv1Mg"/>
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnu7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="@Action.New" iconURI="platform:/plugin/aero.minova.rcp.images/images/NewRecord.Command/32x32.png" tooltip="@Action.New" command="_laMxu7bdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
+        <visibleWhen xsi:type="ui:ImperativeExpression" xmi:id="_7DFKcCGOEe6YuKiWIJv1Mg"/>
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnvLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.delete" label="@Action.Delete" iconURI="platform:/plugin/aero.minova.rcp.images/images/DeleteRecord.Command/32x32.png" tooltip="@Action.Delete" command="_laMxv7bdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
+        <visibleWhen xsi:type="ui:ImperativeExpression" xmi:id="_7blxECGOEe6YuKiWIJv1Mg"/>
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnvbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="@Action.Discard" iconURI="platform:/plugin/aero.minova.rcp.images/images/DiscardRecord.Command/32x32.png" tooltip="@Action.Discard" command="_laMxwLbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
