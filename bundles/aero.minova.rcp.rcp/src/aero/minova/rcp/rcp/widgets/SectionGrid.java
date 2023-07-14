@@ -618,7 +618,21 @@ public class SectionGrid {
 		return rowsToInsert;
 	}
 
+	/**
+	 * Bei execute-always=true werden alle Zeilen mitgegeben, die nicht in rowsToDelete oder rowsToInsert vorhanden sind
+	 * 
+	 * @return
+	 */
 	public List<Row> getRowsToUpdate() {
+		if (grid.isExecuteAlways()) {
+			for (Row r : sortedList) {
+				if (!rowsToDelete.contains(r) && //
+						!rowsToUpdate.contains(r) && //
+						!rowsToInsert.contains(r)) {
+					rowsToUpdate.add(r);
+				}
+			}
+		}
 		return rowsToUpdate;
 	}
 
