@@ -28,6 +28,7 @@ public class MGrid {
 	private Image icon;
 	private IGridAccessor gridAccessor;
 	private boolean delReqAllParams;
+	private boolean executeAlways;
 	private String fill;
 	private Grid grid;
 	private List<MField> fields;
@@ -334,5 +335,13 @@ public class MGrid {
 	 */
 	public List<Row> getRowsToDelete() {
 		return gridAccessor.getRowsToDelete();
+	}
+
+	public boolean isExecuteAlways() {
+		return executeAlways;
+	}
+
+	public void setExecuteAlways(boolean executeAlways) {
+		this.executeAlways = executeAlways;
 	}
 }
