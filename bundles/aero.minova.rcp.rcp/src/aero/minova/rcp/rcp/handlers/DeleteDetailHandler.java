@@ -17,6 +17,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.form.model.xsd.Detail;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.DirtyFlagUtil;
@@ -51,12 +52,15 @@ public class DeleteDetailHandler {
 	@Evaluate
 	public boolean visible(MPart part) {
 		detail = (WFCDetailPart) part.getObject();
+		if (detail == null || detail.getForm(false) == null || detail.getForm(false).getDetail() == null) {
+			return false;
+		}
+
+		Detail formDetail = detail.getForm(false).getDetail();
 		if (detail.getDetail().isBooking()) {
-			return detail != null && detail.getForm(false) != null && detail.getForm(false).getDetail() != null
-					&& detail.getForm(false).getDetail().isButtonCancelVisible();
+			return formDetail.isButtonCancelVisible();
 		} else {
-			return detail != null && detail.getForm(false) != null && detail.getForm(false).getDetail() != null
-					&& detail.getForm(false).getDetail().isButtonDeleteVisible();
+			return formDetail.isButtonDeleteVisible();
 		}
 	}
 
@@ -99,18 +103,14 @@ public class DeleteDetailHandler {
 		if (mPart.getObject() instanceof WFCDetailPart && dirtyFlagUtil.isDirty()) {
 			MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(),
 					translationService.translate("@msg.DeleteUnsavedChangesTitle", null), null,
-					translationService.translate("@msg.DeleteUnsavedChangesMessage", null), MessageDialog.CONFIRM,
-					new String[] { "OK" }, 0);
+					translationService.translate("@msg.DeleteUnsavedChangesMessage", null), MessageDialog.CONFIRM, new String[] { "OK" }, 0);
 			dialog.open();
 			return;
 		}
 
-		MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(),
-				translationService.translate("@msg.DeleteWarningTitle", null), null,
+		MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.DeleteWarningTitle", null), null,
 				translationService.translate("@msg.DeleteWarningMessage", null), MessageDialog.WARNING,
-				new String[] { translationService.translate("@Action.Delete", null),
-						translationService.translate("@Abort", null) },
-				0);
+				new String[] { translationService.translate("@Action.Delete", null), translationService.translate("@Abort", null) }, 0);
 
 		if (!showDiscardDialogIndex || dialog.open() == 0) {
 			broker.post(Constants.BROKER_DELETEENTRY, perspective);
