@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.handlers;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
+import org.eclipse.e4.core.di.annotations.Evaluate;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -45,6 +46,19 @@ public class SaveDetailHandler implements ValueChangeListener {
 	MPart mPart;
 	WFCDetailPart detail;
 	MDetail mDetail;
+	
+	/**
+	 * Button entsprechend der Maske anzeigen
+	 * 
+	 * @param part
+	 * @return
+	 */
+	@Evaluate
+	public boolean visible(MPart part) {
+		detail = (WFCDetailPart) part.getObject();
+		return detail != null && detail.getForm(false) != null && detail.getForm(false).getDetail() != null
+				&& detail.getForm(false).getDetail().isButtonSaveVisible();
+	}
 
 	@CanExecute
 	public boolean canExecute(MPart mPart) {

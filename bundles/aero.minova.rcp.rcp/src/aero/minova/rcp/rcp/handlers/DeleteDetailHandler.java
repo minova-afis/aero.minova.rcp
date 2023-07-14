@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.handlers;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
+import org.eclipse.e4.core.di.annotations.Evaluate;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -16,6 +17,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.form.model.xsd.Detail;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.DirtyFlagUtil;
@@ -40,6 +42,27 @@ public class DeleteDetailHandler {
 	boolean firstCall = true;
 	MPart mPart;
 	WFCDetailPart detail;
+
+	/**
+	 * Button entsprechend der Maske anzeigen
+	 * 
+	 * @param part
+	 * @return
+	 */
+	@Evaluate
+	public boolean visible(MPart part) {
+		detail = (WFCDetailPart) part.getObject();
+		if (detail == null || detail.getForm(false) == null || detail.getForm(false).getDetail() == null) {
+			return false;
+		}
+
+		Detail formDetail = detail.getForm(false).getDetail();
+		if (detail.getDetail().isBooking()) {
+			return formDetail.isButtonCancelVisible();
+		} else {
+			return formDetail.isButtonDeleteVisible();
+		}
+	}
 
 	@CanExecute
 	public boolean canExecute(MPart mPart) {
