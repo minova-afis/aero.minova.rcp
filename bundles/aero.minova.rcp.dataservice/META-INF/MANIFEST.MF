@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.e4.core.services,
  com.google.gson,
  org.eclipse.e4.core.di.extensions,
  aero.minova.rcp.form.model,
- aero.minova.rcp.constant
+ aero.minova.rcp.constant,
+ javax.inject
 Export-Package: aero.minova.rcp.dataservice,
  aero.minova.rcp.dataservice.internal
 Bundle-ActivationPolicy: lazy
