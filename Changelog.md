@@ -14,8 +14,12 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Neu
+- "execute-always" Flag in Masken für Grids implementieren
+- Die Buttons Delete/Cancel, Save und New können nun auch über die entsprechenden Flags in Masken ausgeblendet werden
+
+
 ### Änderung
-- Die Buttons Delete/Cancel, Save und New können nun auch ausgeblendet werden
 - Quantity Value nun auch als statischen Wert in der XBS ermöglichen
 
 ### Bugfixes
