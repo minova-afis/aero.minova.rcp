@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+## [12.9.7] - 29.08.2023
+
 ### Änderung
 - Die Buttons Delete/Cancel, Save und New können nun auch ausgeblendet werden
 - Quantity Value nun auch als statischen Wert in der XBS ermöglichen
