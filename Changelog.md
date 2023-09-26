@@ -14,6 +14,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Bugfixes
+- 'button-delete-visible' blendet nicht mehr den New Button aus
+- 'buttton-new-visible' blendet nun den New Button aus
+
 ## [12.9.7] - 29.08.2023
 
 ### Änderung
