@@ -30,7 +30,7 @@ public class NewDetailHandler {
 	public boolean visible(MPart part) {
 		WFCDetailPart detail = (WFCDetailPart) part.getObject();
 		return detail != null && detail.getForm(false) != null && detail.getForm(false).getDetail() != null
-				&& detail.getForm(false).getDetail().isButtonDeleteVisible();
+				&& detail.getForm(false).getDetail().isButtonNewVisible();
 	}
 
 	@Execute
