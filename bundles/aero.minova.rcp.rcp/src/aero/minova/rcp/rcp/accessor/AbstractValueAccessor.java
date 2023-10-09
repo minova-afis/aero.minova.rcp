@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.accessor;
 
+import java.util.Comparator;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -151,6 +152,11 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 		// Tut nichts für Felder außer Lookups, ist im LookupValueAccessor überschrieben
 	}
 
+	@Override
+	public void setComparatorForLookupContentProvider(Comparator<LookupValue> comparator) {
+		// Tut nichts für Felder außer Lookups, ist im LookupValueAccessor überschrieben
+	}
+
 	protected void setText(Control control, String text) {
 		if (control instanceof TextAssist ta) {
 			ta.setText(text);
@@ -161,9 +167,14 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Override
 	public void setTooltip(String tooltip) {
+		if (control.isDisposed()) {
+			return;
+		}
+
 		if (tooltip != null) {
 			tooltip = TranslateUtil.translateWithParameters(tooltip, translationService);
 		}
+
 		if (control instanceof TextAssist ta) {
 			ta.getChildren()[0].setToolTipText(tooltip);
 		} else {

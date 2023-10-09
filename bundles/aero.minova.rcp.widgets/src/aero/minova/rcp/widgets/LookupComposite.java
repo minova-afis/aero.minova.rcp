@@ -602,7 +602,7 @@ public class LookupComposite extends Composite {
 	 */
 	private boolean checkLastState() {
 		String state = CacheUtil.getNameList((MField) this.getData(Constants.CONTROL_FIELD));
-		if (!state.equals(lastRequestState)) {
+		if (!Objects.equals(state, lastRequestState)) {
 			return false;
 		}
 

@@ -19,7 +19,8 @@ public class Constants {
 	public static final String SAVE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.save";
 	public static final String REVERT_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.revert";
 	public static final String DELETE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.delete";
-
+	public static final String BLOCK_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.block";
+	
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
 

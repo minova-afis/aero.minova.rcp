@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Dataservice
 Bundle-SymbolicName: aero.minova.rcp.dataservice
-Bundle-Version: 12.9.0.qualifier
+Bundle-Version: 12.9.7.qualifier
 Automatic-Module-Name: aero.minova.rcp.dataservice
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.e4.core.services,
@@ -19,13 +19,14 @@ Require-Bundle: org.eclipse.e4.core.services,
  com.google.gson,
  org.eclipse.e4.core.di.extensions,
  aero.minova.rcp.form.model,
- aero.minova.rcp.constant
+ aero.minova.rcp.constant,
+ javax.inject
 Export-Package: aero.minova.rcp.dataservice,
  aero.minova.rcp.dataservice.internal
 Bundle-ActivationPolicy: lazy
+Import-Package: javax.xml.bind
 Service-Component: OSGI-INF/aero.minova.rcp.dataservice.internal.DataFormService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.DataService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaImageService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaJsonService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaPluginService.xml
-Import-Package: javax.xml.bind

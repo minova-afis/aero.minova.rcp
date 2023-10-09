@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.util;
 
+import java.text.DecimalFormatSymbols;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
@@ -8,7 +9,10 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
+import aero.minova.rcp.model.QuantityValue;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.util.NumberFormatUtil;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.util.TimeUtil;
@@ -74,7 +78,9 @@ public class StaticXBSValueUtil {
 		case ZONED:
 			return new Value(ZonedDateTime.parse(valueString), DataType.ZONED);
 		case QUANTITY:
-			// TODO #1462
+			DecimalFormatSymbols dfs = new DecimalFormatSymbols(CustomLocale.getLocale());
+			String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(valueString);
+			return new QuantityValue(numberAndUnit[0], numberAndUnit[1], DataType.QUANTITY, dfs);
 		}
 		return null;
 	}

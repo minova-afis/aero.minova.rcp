@@ -14,16 +14,79 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Bugfixes
+- 'button-delete-visible' blendet nicht mehr den New Button aus
+- 'buttton-new-visible' blendet nun den New Button aus
+
+## [12.9.7] - 29.08.2023
+
+### Änderung
+- Die Buttons Delete/Cancel, Save und New können nun auch ausgeblendet werden
+- Quantity Value nun auch als statischen Wert in der XBS ermöglichen
+
+### Bugfixes
+- Verhindern, dass alle Profile auf einmal gelöscht werden können
+- Bei Lookups mit Tabellen/Views die LastAction als Integer schicken. Wichtig für Postgres-Datenbanken, da hier der Dateityp genau passen muss.
+
+
+## [12.9.6] - 07.06.2023
+
+### Änderung
+- Aussagekräftige Fehlermeldung anzeigen, wenn eine Maske für ein ParamString Feld nicht gefunden werden konnte (Übersetzung ab i18n 12.16.0)
+- Minova-Adresse aktualisieren
+
+### Bugfixes
+- Fehlerhafte Eingaben in Nattables wieder rot markieren, die falschen Eingaben vor Laden des Index entfernen
+
+
+## [12.9.5] - 19.05.2023
+
+### Änderung
+- Lookups die Möglichkeit geben, die Einträge über einen Helper zu sortieren 
+- Unter Linux den Spashscreen schließen, sobald Login-Dialog öffnet, damit Dialog nicht vom Splash überdeckt wird
+- Profile im Login-Dialog alphabetisch sortiert anzeigen
+
+### Bugfixes
+- ValueChangeEvent#isUser von ParamString-Feldern korrekt setzten
+- Fehler beim Laden von Grids ausbessern, hat Grids betroffen, die in der xbs eine Verknüpfung zu einem nicht-primary-key Feld enthalten haben
+
+## [12.9.4] - 04.05.2023
+
+### Änderung
+- Lookups: Bei Resolve NIE nach LastAction filtern; bei List wie in Maske angegeben (betrifft Lookups über Prozeduren und Tabellen/Views)
+
+### Bugfixes
+- Nullpointer bei Klick auf Lookup-Text vermeiden
+
+## [12.9.3] - 03.05.2023
+
+### Bugfixes
+- Bei Resolve-Cache von Lookups ggf. die Parameter mit beachten
+
+## [12.9.2] - 02.05.2023
+
+### Änderung
+- Verbesserte Fehlermeldungen beim Öffnen von Wizards (benötigt i18n 12.15.0)
+
+### Bugfixes
+- Wizards lassen sich wieder mehrmals Öffnen
+- Blockier-Knopf in Masken mit weiteren Knöpfen in Detail-Toolbar ermöglichen
+
+## [12.9.1] - 27.04.2023
+
 ### Änderung
 - Benachrichtigung anzeigen, wenn Prozeduraufruf über Knopf erfolgreich war (ohne Helper, benötigt i18n 12.14.0)
 - Überall .classpath und prefs updaten (für Java 17)
 - Warnungen entfernen, Code bereinigen
 - Nummernfelder etwas verkleinern, um Einheiten mehr Platz zu geben
 - Tests unter Linux wieder aktivieren
+- Nattable Spalten mit maximal Breite 3000 wiederherstellen
 - Bei gesetzter Location in der Debug Konfiguration Anwendung nicht starten
 
 ### Bugfixes
 - Tab in Statistik-Part ausbessern
+- Fehler im Laden des neusten Helpers ausbessern
+- NatTable auf Version 2.1.0 erhöhen, damit Ausklappen von Gruppen unter Mac wieder funktioniert
 
 ## [12.9.0] - 23.03.2023
 

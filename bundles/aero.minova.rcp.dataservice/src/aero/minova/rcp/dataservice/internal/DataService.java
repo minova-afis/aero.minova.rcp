@@ -97,7 +97,7 @@ public class DataService implements IDataService {
 	private int minTimeBetweenError = 3;
 	Map<String, Long> timeOfLastErrorMessage = new HashMap<>();
 
-	private static final FilterValue fv = new FilterValue(">", "0", "");
+	private static final FilterValue fv = new FilterValue(">", 0, "");
 
 	private static final boolean LOG_CACHE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
 	private static final boolean LOG_SQL_STRING = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/logsqlstring"));
@@ -690,7 +690,7 @@ public class DataService implements IDataService {
 	@Override
 	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
 		if (field.getLookupTable() != null) {
-			return getLookupValuesFromTable(field.getLookupTable(), field.getLookupDescription(), keyLong, keyText, true, useCache);
+			return getLookupValuesFromTable(field.getLookupTable(), field.getLookupDescription(), keyLong, keyText, true, useCache, field.isFilterLastAction());
 		} else {
 			String procedureName = field.getLookupProcedurePrefix() + "Resolve";
 			return getLookupValuesFromProcedure(procedureName, field, keyLong, keyText, true, useCache);
@@ -699,14 +699,15 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache) {
-		return getLookupValuesFromTable(tableName, Constants.TABLE_DESCRIPTION, null, null, true, useCache);
+		return getLookupValuesFromTable(tableName, Constants.TABLE_DESCRIPTION, null, null, true, useCache, false);
 	}
 
 	@Override
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache) {
 		boolean useCacheLookup = false; // siehe #707
 		if (field.getLookupTable() != null) {
-			return getLookupValuesFromTable(field.getLookupTable(), field.getLookupDescription(), null, null, false, useCacheLookup);
+			return getLookupValuesFromTable(field.getLookupTable(), field.getLookupDescription(), null, null, false, useCacheLookup,
+					field.isFilterLastAction());
 		} else {
 			String procedureName = field.getLookupProcedurePrefix() + "List";
 			return getLookupValuesFromProcedure(procedureName, field, null, null, false, useCacheLookup);
@@ -714,7 +715,7 @@ public class DataService implements IDataService {
 	}
 
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromTable(String tableName, String lookupDescriptionColumnName, Integer keyLong, String keyText,
-			boolean resolve, boolean useCache) {
+			boolean resolve, boolean useCache, boolean filterLastAction) {
 		List<LookupValue> list = new ArrayList<>();
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
 
@@ -728,19 +729,7 @@ public class DataService implements IDataService {
 			return CompletableFuture.supplyAsync(() -> list);
 		}
 
-		Table t = TableBuilder.newTable(tableName) //
-				.withColumn(Constants.TABLE_KEYLONG, DataType.INTEGER)//
-				.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
-				.withColumn(lookupDescriptionColumnName, DataType.STRING)//
-				.withColumn(Constants.TABLE_LASTACTION, DataType.INTEGER)//
-				.create();
-		Row row = RowBuilder.newRow() //
-				.withValue(keyLong) //
-				.withValue(keyText) //
-				.withValue(null) //
-				.withValue(fv) //
-				.create();
-		t.addRow(row);
+		Table t = getTableForTableLookup(tableName, lookupDescriptionColumnName, keyLong, keyText, resolve, filterLastAction);
 
 		CompletableFuture<Table> tableFuture = getTableAsync(t, false);
 
@@ -769,6 +758,24 @@ public class DataService implements IDataService {
 		});
 	}
 
+	private Table getTableForTableLookup(String tableName, String lookupDescriptionColumnName, Integer keyLong, String keyText, boolean resolve,
+			boolean filterLastAction) {
+		Table t = TableBuilder.newTable(tableName) //
+				.withColumn(Constants.TABLE_KEYLONG, DataType.INTEGER)//
+				.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
+				.withColumn(lookupDescriptionColumnName, DataType.STRING)//
+				.withColumn(Constants.TABLE_LASTACTION, DataType.INTEGER)//
+				.create();
+		Row row = RowBuilder.newRow() //
+				.withValue(keyLong) //
+				.withValue(keyText) //
+				.withValue(null) //
+				.withValue(resolve || !filterLastAction ? null : fv) // Bei Resolve oder FilterLastAction=false nicht nach LastAction filtern #1482
+				.create();
+		t.addRow(row);
+		return t;
+	}
+
 	private void handleLookupError(String tableOrProcedureName, List<LookupValue> list, HashMap<Integer, LookupValue> map, Throwable e) {
 		logCache("Error, using cache: " + tableOrProcedureName);
 		postError(new ErrorObject("msg.WFCNoResponseServerUsingCache", username, e));
@@ -778,7 +785,7 @@ public class DataService implements IDataService {
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromProcedure(String procedureName, MField field, Integer keyLong, String keyText,
 			boolean resolve, boolean useCache) {
 		List<LookupValue> list = new ArrayList<>();
-		String hashName = resolve ? procedureName : CacheUtil.getNameList(field);
+		String hashName = resolve && !field.isUseResolveParms() ? procedureName : CacheUtil.getNameList(field);
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
@@ -791,7 +798,7 @@ public class DataService implements IDataService {
 			return CompletableFuture.supplyAsync(() -> list);
 		}
 
-		Table t = getLookupValuesFromProcedureTable(procedureName, field, keyLong, keyText, resolve);
+		Table t = getTableForProcedureLookup(procedureName, field, keyLong, keyText, resolve);
 
 		CompletableFuture<SqlProcedureResult> tableFuture = callProcedureAsync(t, false);
 
@@ -803,7 +810,7 @@ public class DataService implements IDataService {
 		return tableFuture.thenApplyAsync(res -> handleLookupFromProcedureResponse(procedureName, list, map, res));
 	}
 
-	private Table getLookupValuesFromProcedureTable(String procedureName, MField field, Integer keyLong, String keyText, boolean resolve) {
+	private Table getTableForProcedureLookup(String procedureName, MField field, Integer keyLong, String keyText, boolean resolve) {
 		Table t = TableBuilder.newTable(procedureName).create();
 		Row row = RowBuilder.newRow().create();
 
@@ -815,7 +822,7 @@ public class DataService implements IDataService {
 			row.addValue(new Value(keyText));
 
 			t.addColumn(new Column(Constants.TABLE_FILTERLASTACTION, DataType.BOOLEAN));
-			row.addValue(new Value(true));
+			row.addValue(new Value(false)); // Bei Resolve nie nach LastAction filtern #1482
 
 			if (field.getLookupParameters() != null && field.isUseResolveParms()) {
 				for (String paramName : field.getLookupParameters()) {
@@ -828,7 +835,7 @@ public class DataService implements IDataService {
 			t.addColumn(new Column(Constants.TABLE_COUNT, DataType.INTEGER));
 			row.addValue(null);
 			t.addColumn(new Column(Constants.TABLE_FILTERLASTACTION, DataType.BOOLEAN));
-			row.addValue(new Value(true));
+			row.addValue(new Value(field.isFilterLastAction())); // Bei List FilterLastAction nach Einstellung in Maske (default true) #1482
 			if (field.getLookupParameters() != null) {
 				for (String paramName : field.getLookupParameters()) {
 					MField paramField = field.getDetail().getField(paramName);

@@ -189,6 +189,8 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		case PERIOD:
 			// Sollte nicht vorkommen?
 			break;
+		default:
+			break;
 		}
 
 		initField(label, required, mField);
@@ -258,6 +260,8 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 			break;
 		case PERIOD:
 			// Sollte nicht vorkommen
+			break;
+		default:
 			break;
 		}
 

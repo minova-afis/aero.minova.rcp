@@ -955,14 +955,9 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void reloadFields(@UIEventTopic(Constants.BROKER_RELOADFIELDS) Table keyTable) {
 		if (isActivePerspective()) {
-			if (keyTable == null && keys != null) {
-				keyTable = new Table();
-				Row r = new Row();
-				for (Entry<String, Value> e : keys.entrySet()) {
-					keyTable.addColumn(new Column(e.getKey(), e.getValue().getType()));
-					r.addValue(e.getValue());
-				}
-				keyTable.addRow(r);
+			if (keyTable == null) {
+				// Sind keine keys gegeben aktuellen Stand aus dem Detail nutzen
+				keyTable = selectedTable;
 			}
 			readData(keyTable, false); // Nach Speichern soll discard-Nachricht nicht angezeigt werden
 		}
@@ -1166,26 +1161,36 @@ public class WFCDetailCASRequestsUtil {
 
 		if (formName != null) {
 			Form f = dataFormService.getForm(formName);
-			for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
-				List<Object> fieldsOrGrids = new ArrayList<>();
 
-				if (o instanceof Head h) {
-					fieldsOrGrids = h.getFieldOrGrid();
-				} else if (o instanceof Page p) {
-					fieldsOrGrids = p.getFieldOrGrid();
-				}
-
-				for (Object fieldOrGrid : fieldsOrGrids) {
-					if (fieldOrGrid instanceof Field field) {
-						subfields.add(field);
-					}
-				}
+			if (f == null) {
+				broker.send(Constants.BROKER_SHOWERRORMESSAGE, "@msg.FormForParamStringNotFound %" + formName);
+				return;
 			}
+
+			getSubFields(subfields, f);
 		}
 
 		mParamString.getSubFields().clear();
 		mParamString.getSubFields().addAll(subfields);
 		redrawSection(mParamString.getMSection());
+	}
+
+	private void getSubFields(List<Field> subfields, Form f) {
+		for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
+			List<Object> fieldsOrGrids = new ArrayList<>();
+
+			if (o instanceof Head h) {
+				fieldsOrGrids = h.getFieldOrGrid();
+			} else if (o instanceof Page p) {
+				fieldsOrGrids = p.getFieldOrGrid();
+			}
+
+			for (Object fieldOrGrid : fieldsOrGrids) {
+				if (fieldOrGrid instanceof Field field) {
+					subfields.add(field);
+				}
+			}
+		}
 	}
 
 	private void updateGridLookupValues() {

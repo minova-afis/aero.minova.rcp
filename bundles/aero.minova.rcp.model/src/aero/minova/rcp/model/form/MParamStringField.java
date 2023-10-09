@@ -98,7 +98,7 @@ public class MParamStringField extends MField implements ValueChangeListener {
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
 		if (evt.isUser()) {
-			this.setValue(getValue(), false);
+			this.setValue(getValue(), true);
 		}
 	}
 

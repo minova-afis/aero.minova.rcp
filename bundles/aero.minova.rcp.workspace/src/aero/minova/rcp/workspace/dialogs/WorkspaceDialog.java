@@ -4,11 +4,13 @@ import static org.eclipse.jface.widgets.WidgetFactory.label;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -32,6 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
+import aero.minova.rcp.util.OSUtil;
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
@@ -40,7 +43,6 @@ public class WorkspaceDialog extends Dialog {
 	private Text username;
 	private Text password;
 	private Text applicationArea;
-	private Button btnOK;
 	private Button btnDefault;
 	private Text message;
 	private Text connectionString;
@@ -55,13 +57,15 @@ public class WorkspaceDialog extends Dialog {
 
 	private boolean loadedProfile = false;
 	private String defaultConnectionString;
+	private IApplicationContext applicationContext;
 
-	public WorkspaceDialog(Shell parentShell) {
+	public WorkspaceDialog(Shell parentShell, IApplicationContext applicationContext) {
 		super(parentShell);
+		this.applicationContext = applicationContext;
 	}
 
-	public WorkspaceDialog(Shell parentShell, String profileName) {
-		this(parentShell);
+	public WorkspaceDialog(Shell parentShell, IApplicationContext applicationContext, String profileName) {
+		this(parentShell, applicationContext);
 		this.profileName = profileName;
 	}
 
@@ -118,7 +122,15 @@ public class WorkspaceDialog extends Dialog {
 		deleteProfile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText());
+
+				String profileNameToDelete = profile.getText();
+				logger.info("Deleting Profile \"" + profileNameToDelete + "\"");
+				if (profileNameToDelete == null || profileNameToDelete.isBlank()) {
+					logger.info("No profile selected, not deleting");
+					return;
+				}
+
+				WorkspaceAccessPreferences.deleteSavedWorkspace(profileNameToDelete);
 				try {
 					// Workspace Ordner löschen
 					FileUtils.deleteDirectory(new File(applicationArea.getText().replace("file:", "")));
@@ -200,16 +212,19 @@ public class WorkspaceDialog extends Dialog {
 	}
 
 	/**
-	 * Füllt die ComboBox mit den vorhandenen Profilen
+	 * Füllt die ComboBox mit den vorhandenen Profilen in alphabetischer Reihenfolge
 	 */
 	private void fillProfiles() {
-		for (ISecurePreferences prefs : WorkspaceAccessPreferences.getSavedWorkspaceAccessData()) {
+		List<String> prefNames = WorkspaceAccessPreferences.getSavedWorkspaceAccessData().stream().map(pref -> {
 			try {
-				profile.add(prefs.get(WorkspaceAccessPreferences.PROFILE, ""));
-			} catch (StorageException e1) {
-				logger.error(e1.getMessage(), e1);
+				return pref.get(WorkspaceAccessPreferences.PROFILE, "");
+			} catch (StorageException e) {
+				logger.error(e.getMessage(), e);
+				return "";
 			}
-		}
+		}).toList();
+
+		prefNames.stream().sorted(Comparator.comparing(String::toString, String.CASE_INSENSITIVE_ORDER)).forEach(s -> profile.add(s));
 	}
 
 	/**
@@ -237,7 +252,7 @@ public class WorkspaceDialog extends Dialog {
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
+		Button btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
 		btnOK.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -291,4 +306,14 @@ public class WorkspaceDialog extends Dialog {
 	public void setDefaultConnectionString(String defaultConnectionString) {
 		this.defaultConnectionString = defaultConnectionString;
 	}
+
+	@Override
+	public int open() {
+		if (OSUtil.isLinux()) {
+			// Unter Linux den Splash-Screen sofort schließen, siehe #1487
+			applicationContext.applicationRunning();
+		}
+		return super.open();
+	}
+
 }

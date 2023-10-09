@@ -658,14 +658,21 @@ public abstract class WFCNattablePart extends WFCFormPart {
 			int position = Integer.parseInt(keyValue[0].trim());
 			int width = Integer.parseInt(keyValue[1].trim());
 			order.add(position);
+
+			// Unter Mac werden die Spalten sonst kleiner beim Laden
+			if (OSUtil.isMac()) {
+				width += Math.round(width / 3.03);
+			}
+
+			// Teilweise werden die Breiten viel zu groß. Deshalb auf 3000 beschränken (siehe auch #1471)
+			if (width > 3000) {
+				width = 3000;
+			}
+
 			if (width < 0) {
 				continue;
 			}
 
-			if (OSUtil.isMac()) {
-				// Unter Mac werden die Spalten sonst kleiner beim Laden
-				width += Math.round(width / 3.03);
-			}
 			bodyLayerStack.getBodyDataLayer().setColumnWidthByPosition(position, width);
 		}
 

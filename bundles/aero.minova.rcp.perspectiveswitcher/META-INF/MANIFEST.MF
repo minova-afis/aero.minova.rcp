@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Perspectiveswitcher
 Bundle-SymbolicName: aero.minova.rcp.perspectiveswitcher
-Bundle-Version: 12.9.0.qualifier
+Bundle-Version: 12.9.7.qualifier
 Automatic-Module-Name: aero.minova.rcp.perspectiveswitcher
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: javax.inject,
