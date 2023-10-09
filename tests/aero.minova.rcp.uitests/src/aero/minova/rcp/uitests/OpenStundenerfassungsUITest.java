@@ -49,6 +49,7 @@ class OpenStundenerfassungsUITest {
 	}
 
 	private void open() {
+		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		// Stundenerfassung über das Menü öffnen
 		SWTBotMenu adminMenu = bot.menu("Verwaltung");
 		assertNotNull(adminMenu);
