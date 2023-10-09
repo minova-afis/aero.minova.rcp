@@ -17,6 +17,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 - 'button-delete-visible' blendet nicht mehr den New Button aus
 - 'buttton-new-visible' blendet nun den New Button aus
+- DateTimeFelder in Grids korrigieren, nutzen nun die eingestellte Zeitzone korrekt
 
 ## [12.9.7] - 29.08.2023
 
