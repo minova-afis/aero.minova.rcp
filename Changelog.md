@@ -16,6 +16,12 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - "execute-always" Flag in Masken für Grids implementieren
+
+### Bugfixes
+- 'button-delete-visible' blendet nicht mehr den New Button aus
+- 'button-new-visible' blendet nun den New Button aus
+
+## [12.9.7] - 29.08.2023
 - Die Buttons Delete/Cancel, Save und New können nun auch über die entsprechenden Flags in Masken ausgeblendet werden
 
 
