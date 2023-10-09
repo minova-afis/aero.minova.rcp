@@ -16,13 +16,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.e4.core.commands.ECommandService;
-import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -31,20 +28,11 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.commands.MCommand;
-import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
-import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -55,25 +43,16 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Item;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -91,17 +70,12 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
-import aero.minova.rcp.form.model.xsd.Onclick;
-import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.form.model.xsd.Procedure;
-import aero.minova.rcp.form.model.xsd.Wizard;
 import aero.minova.rcp.form.setup.util.XBSUtil;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MBrowser;
-import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
@@ -121,7 +95,6 @@ import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.BrowserAccessor;
-import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
@@ -137,6 +110,7 @@ import aero.minova.rcp.rcp.fields.RadioField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.util.CreateButtonInDetailUtil;
 import aero.minova.rcp.rcp.util.DirtyFlagUtil;
 import aero.minova.rcp.rcp.util.SectionWrapper;
 import aero.minova.rcp.rcp.util.TabUtil;
@@ -175,22 +149,11 @@ public class WFCDetailPart extends WFCFormPart {
 	private TranslationService translationService;
 	private Locale locale;
 
-	@Inject
-	private ECommandService commandService;
-
-	@Inject
-	private EHandlerService handlerService;
 	private LocalResourceManager resManager;
 	private WFCDetailCASRequestsUtil casRequestsUtil;
 	private DirtyFlagUtil dirtyFlagUtil;
 
 	private int detailWidth;
-
-	@Inject
-	MWindow mwindow;
-
-	@Inject
-	EModelService eModelService;
 
 	ILog logger = Platform.getLog(this.getClass());
 
@@ -203,6 +166,8 @@ public class WFCDetailPart extends WFCFormPart {
 	private MinovaSection headSection;
 
 	private int sectionCount = -1;
+
+	private CreateButtonInDetailUtil buttonUtil;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -225,6 +190,10 @@ public class WFCDetailPart extends WFCFormPart {
 		// DiryFlagUtil erstellen und in Kontext setzten
 		dirtyFlagUtil = ContextInjectionFactory.make(DirtyFlagUtil.class, mPart.getContext());
 		mPerspective.getContext().set(DirtyFlagUtil.class, dirtyFlagUtil);
+
+		buttonUtil = ContextInjectionFactory.make(CreateButtonInDetailUtil.class, mPart.getContext());
+		buttonUtil.setMDetail(mDetail);
+		buttonUtil.setForm(form);
 
 		layoutForm(parent);
 
@@ -537,8 +506,9 @@ public class WFCDetailPart extends WFCFormPart {
 		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead(), "open", mDetail, headOrPageOrGrid.getId(), section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
+
 		// Button erstellen, falls vorhanden
-		createButton(headOrPageOrGrid, section);
+		buttonUtil.createButton(headOrPageOrGrid, section);
 
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
 
@@ -618,295 +588,6 @@ public class WFCDetailPart extends WFCFormPart {
 		mDetail.addMSection(mSection);
 	}
 
-	/**
-	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
-	 *
-	 * @param composite2
-	 * @param headOPOGWrapper
-	 * @param mSection
-	 * @param section
-	 */
-	private void createButton(SectionWrapper headOPOGWrapper, Section section) {
-		if (headOPOGWrapper.getSection() instanceof Grid || headOPOGWrapper.getSection() instanceof Browser) {
-			return;
-		}
-
-		boolean isHead = headOPOGWrapper.isHead() && !headOPOGWrapper.isOP();
-
-		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
-
-		List<aero.minova.rcp.form.model.xsd.Button> buttons = null;
-		if (headOPOGWrapper.getSection() instanceof Head) {
-			buttons = ((Head) headOPOGWrapper.getSection()).getButton();
-		} else {
-			buttons = ((Page) headOPOGWrapper.getSection()).getButton();
-		}
-
-		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
-			MButton mButton = new MButton(btn.getId());
-			mButton.setText(btn.getText());
-			mButton.setIcon(btn.getIcon());
-
-			ButtonAccessor ba;
-			if (isHead) {
-				ba = createToolItemInPartToolbar(btn);
-			} else {
-				ba = createToolItemInSection(bar, btn);
-			}
-
-			mButton.setButtonAccessor(ba);
-			ba.setmButton(mButton);
-			mDetail.putButton(mButton);
-		}
-
-		section.setTextClient(bar);
-	}
-
-	private ButtonAccessor createToolItemInSection(final ToolBar bar, aero.minova.rcp.form.model.xsd.Button btn) {
-
-		// Kein Gruppenname: Element nur in Toolbar, kein Menü
-		if (btn.getGroup() == null) {
-			ToolItem item = new ToolItem(bar, SWT.PUSH);
-			fillItemWithValues(item, btn);
-			return new ButtonAccessor(item);
-		}
-
-		// Menü für Gruppennamen finden
-		Menu groupMenu = null;
-		if (btn.getGroup() != null) {
-			for (ToolItem c : bar.getItems()) {
-				if (btn.getGroup().equalsIgnoreCase((String) c.getData(Constants.GROUP_NAME))) {
-					groupMenu = (Menu) c.getData(Constants.GROUP_MENU);
-					break;
-				}
-			}
-		}
-
-		ToolItem toolItem = null;
-
-		// Erstes Vorkommen des Gruppennamens: Element in Toolbar, Menü muss noch erstellt werden
-		if (groupMenu == null) {
-			final ToolItem item = new ToolItem(bar, SWT.DROP_DOWN);
-			fillItemWithValues(item, btn);
-
-			Menu menu = new Menu(new Shell(Display.getCurrent()), SWT.POP_UP);
-			item.setData(Constants.GROUP_MENU, menu);
-
-			item.addListener(SWT.Selection, event -> {
-				if (event.detail == SWT.ARROW) {
-					Rectangle rect = item.getBounds();
-					Point pt = new Point(rect.x, rect.y + rect.height);
-					pt = bar.toDisplay(pt);
-					menu.setLocation(pt.x, pt.y);
-					menu.setVisible(true);
-				}
-			});
-
-			toolItem = item;
-			groupMenu = menu;
-		}
-
-		// Wenn Gruppenname gegeben ist soll der Button immer auch in das Dropdown-Menü
-		MenuItem menuEntry = new MenuItem(groupMenu, SWT.PUSH);
-		fillItemWithValues(menuEntry, btn);
-
-		return new ButtonAccessor(toolItem, menuEntry);
-	}
-
-	/**
-	 * Füllt das Item mit den Werten aus dem Knopf (Text, Tooptip, Icon) und fügt den Onclick Listener hinzu, wenn in der Maske definiert
-	 *
-	 * @param item
-	 * @param btn
-	 */
-	private void fillItemWithValues(Item item, aero.minova.rcp.form.model.xsd.Button btn) {
-		item.setData(btn);
-		item.setData(Constants.GROUP_NAME, btn.getGroup());
-
-		if (item instanceof MenuItem) {
-			((MenuItem) item).setEnabled(btn.isEnabled());
-		} else if (item instanceof ToolItem) {
-			((ToolItem) item).setEnabled(btn.isEnabled());
-		}
-
-		if (btn.getText() != null) {
-			if (item instanceof MenuItem) {
-				((MenuItem) item).setText(translationService.translate(btn.getText(), null));
-				((MenuItem) item).setToolTipText(translationService.translate(btn.getText(), null));
-			} else if (item instanceof ToolItem) {
-				((ToolItem) item).setToolTipText(translationService.translate(btn.getText(), null));
-			}
-			item.setData(FieldUtil.TRANSLATE_PROPERTY, btn.getText());
-		}
-		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
-			item.setImage(resManager.createImage(buttonImageDescriptor));
-		}
-
-		Object event = findEventForID(btn.getId());
-		if (event instanceof Onclick) {
-			Onclick onclick = (Onclick) event;
-			if (item instanceof MenuItem) {
-				((MenuItem) item).addSelectionListener(getSelectionAdapterForItem(onclick, item));
-			} else if (item instanceof ToolItem) {
-				((ToolItem) item).addSelectionListener(getSelectionAdapterForItem(onclick, item));
-			}
-		}
-	}
-
-	private SelectionAdapter getSelectionAdapterForItem(Onclick onclick, Item item) {
-		return new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				boolean isEnabled = false;
-				if (item instanceof MenuItem) {
-					isEnabled = ((MenuItem) item).isEnabled();
-				} else if (item instanceof ToolItem) {
-					isEnabled = ((ToolItem) item).isEnabled();
-				}
-				if (e.detail != SWT.ARROW && isEnabled) {
-					// TODO: Andere procedures/bindings/instances auswerten
-					List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
-
-					for (Object o : binderOrProcedureOrInstances) {
-						if (o instanceof Wizard) {
-							Map<String, String> parameter = Map.of(Constants.CLAZZ, Constants.WIZARD, Constants.PARAMETER, ((Wizard) o).getWizardname());
-							ParameterizedCommand command = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_DYNAMIC_BUTTON, parameter);
-							handlerService.executeHandler(command);
-						} else if (o instanceof Procedure) {
-							casRequestsUtil.callProcedure((Procedure) o);
-						} else {
-							// Auch in Methode createParameters() anpassen!!
-							System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
-						}
-					}
-				}
-			}
-		};
-	}
-
-	private ButtonAccessor createToolItemInPartToolbar(aero.minova.rcp.form.model.xsd.Button btn) {
-
-		// Kein Gruppenname: Element nur in Toolbar, kein Menü
-		if (btn.getGroup() == null) {
-			MHandledToolItem handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
-			fillMHandledItemWithValues(handledToolItem, btn);
-			mPart.getToolbar().getChildren().add(handledToolItem);
-			return new ButtonAccessor(handledToolItem);
-		}
-
-		// Menü für Gruppennamen finden
-		MMenu groupMenu = null;
-		if (btn.getGroup() != null) {
-			for (MToolBarElement element : mPart.getToolbar().getChildren()) {
-				if (btn.getGroup().equalsIgnoreCase(element.getPersistedState().get(Constants.GROUP_NAME))) {
-					groupMenu = ((MHandledToolItem) element).getMenu();
-					break;
-				}
-			}
-		}
-
-		MHandledToolItem handledToolItem = null;
-
-		// Erstes Vorkommen des Gruppennamens: Element in Toolbar, Menü muss noch erstellt werden
-		if (groupMenu == null) {
-			handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
-			fillMHandledItemWithValues(handledToolItem, btn);
-			mPart.getToolbar().getChildren().add(handledToolItem);
-
-			groupMenu = eModelService.createModelElement(MMenu.class);
-			handledToolItem.getPersistedState().put(Constants.GROUP_NAME, btn.getGroup());
-			handledToolItem.setMenu(groupMenu);
-		}
-
-		// Wenn Gruppenname gegeben ist soll der Button immer auch in das Dropdown-Menü
-		MHandledMenuItem menuEntry = eModelService.createModelElement(MHandledMenuItem.class);
-		fillMHandledItemWithValues(menuEntry, btn);
-		groupMenu.getChildren().add(menuEntry);
-
-		return new ButtonAccessor(handledToolItem, menuEntry);
-	}
-
-	/**
-	 * Füllt das handledItem mit den Werten aus dem Knopf (Text, Tooptip, Icon), fügt den Command (und damit den Handler) sowie die benötigten Parameter hinzu
-	 *
-	 * @param handledItem
-	 * @param btn
-	 */
-	private void fillMHandledItemWithValues(MHandledItem handledItem, aero.minova.rcp.form.model.xsd.Button btn) {
-		handledItem.getPersistedState().put(IWorkbench.PERSIST_STATE, String.valueOf(false));
-		handledItem.getPersistedState().put(Constants.CONTROL_ID, btn.getId());
-		handledItem.setLabel(btn.getText());
-		handledItem.setTooltip(btn.getText());
-		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			handledItem.setIconURI(ImageUtil.retrieveIcon(btn.getIcon(), false));
-		}
-
-		MCommand command = mApplication.getCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_DYNAMIC_BUTTON);
-		handledItem.setCommand(command);
-
-		Object event = findEventForID(btn.getId());
-		if (event instanceof Onclick) {
-			Onclick onclick = (Onclick) event;
-			List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
-			handledItem.getParameters().addAll(createParameters(binderOrProcedureOrInstances));
-		} else {
-			MParameter mParameterForm = eModelService.createModelElement(MParameter.class);
-			mParameterForm.setName(Constants.PARAMETER);
-			mParameterForm.setValue(btn.getId());
-			handledItem.getParameters().add(mParameterForm);
-		}
-	}
-
-	private List<MParameter> createParameters(List<Object> binderOrProcedureOrInstances) {
-		List<MParameter> parameter = new ArrayList<>();
-		MParameter mParameterForm = null;
-		for (Object o : binderOrProcedureOrInstances) {
-			if (o instanceof Wizard) {
-				mParameterForm = eModelService.createModelElement(MParameter.class);
-				mParameterForm.setName(Constants.CLAZZ);
-				mParameterForm.setValue(Constants.WIZARD);
-				parameter.add(mParameterForm);
-
-				mParameterForm = eModelService.createModelElement(MParameter.class);
-				mParameterForm.setName(Constants.PARAMETER);
-				mParameterForm.setValue(((Wizard) o).getWizardname());
-				parameter.add(mParameterForm);
-			} else if (o instanceof Procedure) {
-				Procedure p = (Procedure) o;
-				String procedureID = p.getName() + p.getParam().hashCode();
-				mPart.getContext().set(procedureID, p);
-
-				mParameterForm = eModelService.createModelElement(MParameter.class);
-
-				mParameterForm.setName(Constants.CLAZZ);
-				mParameterForm.setValue(Constants.PROCEDURE);
-				parameter.add(mParameterForm);
-
-				mParameterForm = eModelService.createModelElement(MParameter.class);
-				mParameterForm.setName(Constants.PARAMETER);
-				mParameterForm.setValue(procedureID);
-				parameter.add(mParameterForm);
-			} else {
-				// Auch in Methode getSelectionAdapterForItem() anpassen!!
-				System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
-			}
-		}
-		return parameter;
-	}
-
-	private Object findEventForID(String id) {
-		if (form.getEvents() != null) {
-			for (Onclick onclick : form.getEvents().getOnclick()) {
-				if (onclick.getRefid().equals(id)) {
-					return onclick;
-				}
-			}
-		}
-		// TODO: Onbinder und ValueChange implementieren
-		return null;
-	}
-
 	private MGrid createMGrid(Grid grid, MSection section) {
 
 		if (grid.getId() == null) {
@@ -984,8 +665,8 @@ public class WFCDetailPart extends WFCFormPart {
 					visibleMFields.add(mField);
 				}
 
-				if (mField instanceof MParamStringField) {
-					for (Field f : ((MParamStringField) mField).getSubFields()) {
+				if (mField instanceof MParamStringField psf) {
+					for (Field f : psf.getSubFields()) {
 						MField subfield = createMField(f, mSection, suffix);
 						((MParamStringField) mField).addSubMField(subfield);
 						if (subfield.isVisible()) {
@@ -1122,8 +803,8 @@ public class WFCDetailPart extends WFCFormPart {
 	private void createField(Composite composite, MField field, int row, int column) {
 		if (field instanceof MBooleanField) {
 			BooleanField.create(composite, field, row, column, locale, mPerspective);
-		} else if (field instanceof MNumberField) {
-			NumberField.create(composite, (MNumberField) field, row, column, locale, mPerspective, translationService);
+		} else if (field instanceof MNumberField mnf) {
+			NumberField.create(composite, mnf, row, column, locale, mPerspective, translationService);
 		} else if (field instanceof MDateTimeField) {
 			DateTimeField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MShortDateField) {
@@ -1140,8 +821,8 @@ public class WFCDetailPart extends WFCFormPart {
 			LabelTextField.createBold(composite, field, row, column, mPerspective);
 		} else if (field instanceof MPeriodField) {
 			PeriodField.create(composite, field, row, locale, mPerspective);
-		} else if (field instanceof MQuantityField) {
-			QuantityField.create(composite, (MQuantityField) field, row, column, locale, mPerspective, translationService);
+		} else if (field instanceof MQuantityField mqf) {
+			QuantityField.create(composite, mqf, row, column, locale, mPerspective, translationService);
 		}
 	}
 
@@ -1192,14 +873,6 @@ public class WFCDetailPart extends WFCFormPart {
 
 	public Composite getComposite() {
 		return composite;
-	}
-
-	public Locale getLocale() {
-		return locale;
-	}
-
-	public boolean isSelectAllControls() {
-		return selectAllControls;
 	}
 
 }
