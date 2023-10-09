@@ -1,6 +1,9 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -35,7 +38,7 @@ public class DateTimeDisplayConverter extends DisplayConverter {
 	@Override
 	public Object displayToCanonicalValue(Object displayValue) {
 		if (displayValue instanceof String dvs && !dvs.isBlank()) {
-			Instant res = DateTimeUtil.getDateTime(dvs, timezone);
+			Instant res = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), dvs, locale, timezone);
 			if (res != null) {
 				return res;
 			} else {
