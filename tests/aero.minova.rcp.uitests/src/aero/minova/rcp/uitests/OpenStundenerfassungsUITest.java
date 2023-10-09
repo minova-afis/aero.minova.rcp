@@ -173,6 +173,10 @@ class OpenStundenerfassungsUITest {
 		SWTBotView previewPart = bot.partById(Constants.PREVIEW_PART);
 		assertNotNull(previewPart);
 		previewPart.close();
+
+		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
+		assertNotNull(indexPart);
+		indexPart.show();
 	}
 
 	@AfterEach
