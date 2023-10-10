@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
@@ -164,6 +166,9 @@ class OpenStundenerfassungsUITest {
 	@Test
 	@DisplayName("Index Drucken")
 	void printIndex() {
+
+		Shell activeShell = Display.getCurrent().getActiveShell();
+
 		open();
 		reloadIndex();
 
@@ -174,9 +179,7 @@ class OpenStundenerfassungsUITest {
 		assertNotNull(previewPart);
 		previewPart.close();
 
-		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
-		assertNotNull(indexPart);
-		indexPart.show();
+		activeShell.setActive();
 	}
 
 	@AfterEach
