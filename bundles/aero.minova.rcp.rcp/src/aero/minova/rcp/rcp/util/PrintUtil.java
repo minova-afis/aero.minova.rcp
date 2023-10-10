@@ -22,6 +22,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Table;
@@ -122,7 +123,7 @@ public class PrintUtil {
 	public static Preview checkPreview(MPerspective mPerspective, EModelService modelService, EPartService partService) {
 
 		// Wir suchen mal nach dem Druck-Part und aktivieren ihn
-		MPart previewPart = (MPart) modelService.find(Preview.PART_ID, mPerspective);
+		MPart previewPart = (MPart) modelService.find(Constants.PREVIEW_PART, mPerspective);
 		if (previewPart.getObject() == null) {
 			partService.showPart(previewPart, PartState.CREATE);
 		}

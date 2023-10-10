@@ -15,6 +15,7 @@ import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,7 @@ class OpenStundenerfassungsUITest {
 	}
 
 	private void open() {
+		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		// Stundenerfassung über das Menü öffnen
 		SWTBotMenu adminMenu = bot.menu("Verwaltung");
 		assertNotNull(adminMenu);
@@ -158,6 +160,25 @@ class OpenStundenerfassungsUITest {
 		String numberEntriesString = indexNattable.getCellDataValueByPosition(2, 1);
 		assertNotNull(numberEntriesString);
 		assertTrue(Integer.parseInt(numberEntriesString) > 0);
+	}
+
+	@Test
+	@DisplayName("Index Drucken")
+	void printIndex() {
+
+		SWTBotShell activeShell = bot.activeShell();
+		open();
+		reloadIndex();
+
+		assertTrue(indexToolbar.get(5).isEnabled());
+		indexToolbar.get(5).click();
+
+		SWTBotView previewPart = bot.partById(Constants.PREVIEW_PART);
+		assertNotNull(previewPart);
+		previewPart.close();
+
+		activeShell.activate();
+
 	}
 
 	@AfterEach

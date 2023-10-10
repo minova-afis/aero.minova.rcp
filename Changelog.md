@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Änderung
+- Test für Index-Druck
+
 ### Bugfixes
 - 'button-delete-visible' blendet nicht mehr den New Button aus
 - 'buttton-new-visible' blendet nun den New Button aus
