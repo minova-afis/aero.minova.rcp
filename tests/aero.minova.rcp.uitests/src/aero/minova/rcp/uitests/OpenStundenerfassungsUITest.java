@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
@@ -17,6 +15,7 @@ import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -167,8 +166,7 @@ class OpenStundenerfassungsUITest {
 	@DisplayName("Index Drucken")
 	void printIndex() {
 
-		Shell activeShell = Display.getCurrent().getActiveShell();
-
+		SWTBotShell activeShell = bot.activeShell();
 		open();
 		reloadIndex();
 
@@ -179,7 +177,8 @@ class OpenStundenerfassungsUITest {
 		assertNotNull(previewPart);
 		previewPart.close();
 
-		activeShell.setActive();
+		activeShell.activate();
+
 	}
 
 	@AfterEach
