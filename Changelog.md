@@ -20,10 +20,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 - 'button-delete-visible' blendet nicht mehr den New Button aus
 - 'button-new-visible' blendet nun den New Button aus
+- DateTimeFelder in Grids korrigieren, nutzen nun die eingestellte Zeitzone korrekt
+
 
 ## [12.9.7] - 29.08.2023
-- Die Buttons Delete/Cancel, Save und New können nun auch über die entsprechenden Flags in Masken ausgeblendet werden
 
+### Neu
+- Die Buttons Delete/Cancel, Save und New können nun auch über die entsprechenden Flags in Masken ausgeblendet werden
 
 ### Änderung
 - Quantity Value nun auch als statischen Wert in der XBS ermöglichen
