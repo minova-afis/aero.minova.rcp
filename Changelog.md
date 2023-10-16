@@ -14,15 +14,21 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Neu
+- "execute-always" Flag in Masken für Grids implementieren
+
 ### Bugfixes
 - 'button-delete-visible' blendet nicht mehr den New Button aus
-- 'buttton-new-visible' blendet nun den New Button aus
+- 'button-new-visible' blendet nun den New Button aus
 - DateTimeFelder in Grids korrigieren, nutzen nun die eingestellte Zeitzone korrekt
+
 
 ## [12.9.7] - 29.08.2023
 
+### Neu
+- Die Buttons Delete/Cancel, Save und New können nun auch über die entsprechenden Flags in Masken ausgeblendet werden
+
 ### Änderung
-- Die Buttons Delete/Cancel, Save und New können nun auch ausgeblendet werden
 - Quantity Value nun auch als statischen Wert in der XBS ermöglichen
 
 ### Bugfixes

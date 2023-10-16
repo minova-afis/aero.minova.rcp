@@ -602,6 +602,7 @@ public class WFCDetailPart extends WFCFormPart {
 		mgrid.setProcedureSuffix(grid.getProcedureSuffix());
 		mgrid.setProcedurePrefix(grid.getProcedurePrefix());
 		mgrid.setmSection(section);
+		mgrid.setExecuteAlways(grid.isExecuteAlways());
 		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptor(grid.getIcon(), false);
 		Image gridImage = resManager.createImage(gridImageDescriptor);
 		mgrid.setIcon(gridImage);
