@@ -14,6 +14,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+
+
+## [12.10.0] - 16.10.2023
+
 ### Neu
 - "execute-always" Flag in Masken für Grids implementieren
 
