@@ -16,6 +16,8 @@ import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
  */
 public class InstancePreferenceAccessor {
 
+	private InstancePreferenceAccessor() {}
+
 	/**
 	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen Preferences.
 	 * 
@@ -26,23 +28,13 @@ public class InstancePreferenceAccessor {
 	 */
 	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue, Locale l) {
 		switch (type) {
-		case STRING:
-		case FILE:
-		case DIRECTORY:
-		case COMBO:
-		case URL:
-		case PASSWORD:
-		case LOCALE:
-		case TEXT:
-		case DATE_UTIL:
-		case TIME_UTIL:
+		case STRING, FILE, DIRECTORY, COMBO, URL, PASSWORD, LOCALE, TEXT, DATE_UTIL, TIME_UTIL:
 			return preferences.get(preferenceKey, (String) defaultValue);
 		case INTEGER:
 			return preferences.getInt(preferenceKey, (int) defaultValue);
 		case FLOAT:
 			return preferences.getFloat(preferenceKey, (float) defaultValue);
-		case CHECK:
-		case SENDLOGSBUTTON:
+		case CHECK, SENDLOGSBUTTON, RESETUIBUTTON:
 			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
 			String fd = preferences.get(preferenceKey, (String) defaultValue);
@@ -70,16 +62,7 @@ public class InstancePreferenceAccessor {
 	 */
 	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value, Locale l) {
 		switch (type) {
-		case STRING:
-		case FILE:
-		case DIRECTORY:
-		case COMBO:
-		case URL:
-		case LOCALE:
-		case PASSWORD:
-		case TEXT:
-		case DATE_UTIL:
-		case TIME_UTIL:
+		case STRING, FILE, DIRECTORY, COMBO, URL, LOCALE, PASSWORD, TEXT, DATE_UTIL, TIME_UTIL:
 			preferences.put(preferenceKey, (String) value);
 			break;
 		case INTEGER:

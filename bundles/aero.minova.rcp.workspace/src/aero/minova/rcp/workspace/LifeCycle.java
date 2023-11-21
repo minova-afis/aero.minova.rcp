@@ -121,6 +121,7 @@ public class LifeCycle {
 			}
 
 			// Das darf für UI-Tests nicht ausgeführt werden!
+			checkResetUI(workspaceLocation);
 			checkModelVersion(workspaceLocation, workbenchContext);
 			if (deletePrefs) {
 				deleteCustomPrefs(workspaceLocation);
@@ -269,6 +270,23 @@ public class LifeCycle {
 					deleteCustomPrefs(workspaceLocation);
 					workbenchContext.set(Constants.SHOW_WORKSPACE_RESET_MESSAGE, true);
 				}
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	/**
+	 * Wenn die UI zurückgesetzt werden soll die workbench.xmi Datei löschen. Die anderen Einstellungen sollen erhalten bleiben, siehe #1371
+	 * 
+	 * @param workspaceLocation
+	 */
+	private void checkResetUI(URI workspaceLocation) {
+		Path resolve = Path.of(workspaceLocation).resolve(Constants.RESET_UI_FILE_NAME);
+		if (Files.exists(resolve)) {
+			try {
+				Files.delete(resolve);
+				Files.deleteIfExists(Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}

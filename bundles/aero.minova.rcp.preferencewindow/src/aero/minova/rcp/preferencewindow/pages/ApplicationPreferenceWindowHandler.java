@@ -61,6 +61,7 @@ import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
 import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 import aero.minova.rcp.preferencewindow.control.DateFormattingWidget;
 import aero.minova.rcp.preferencewindow.control.PWLocale;
+import aero.minova.rcp.preferencewindow.control.ResetUIButton;
 import aero.minova.rcp.preferencewindow.control.SendLogsButton;
 import aero.minova.rcp.preferencewindow.control.TextButtonForCurrentWorkspace;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
@@ -289,6 +290,9 @@ public class ApplicationPreferenceWindowHandler {
 			break;
 		case SENDLOGSBUTTON:
 			widget = new SendLogsButton(pref.getLabel(), pref.getTooltip(), key, translationService, dataService);
+			break;
+		case RESETUIBUTTON:
+			widget = new ResetUIButton(pref.getLabel(), pref.getTooltip(), key, translationService, workbench, dataService);
 			break;
 		default:
 			break;
