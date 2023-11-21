@@ -36,6 +36,8 @@ hs_err_pid*
 #Eclipse Settings
 **/.log
 **/.metadata/
+**/.project
+**/*.prefs
 
 # Pomless build artifacts
 .polyglot.feature.xml
