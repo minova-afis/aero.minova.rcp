@@ -277,7 +277,7 @@ public class LifeCycle {
 	}
 
 	/**
-	 * Wenn die UI zurückgesetzt werden soll die workbench.xmi Datei löschen. Die anderen Einstellungen sollen erhalten bleiben, siehe #1371
+	 * Wenn die UI zurückgesetzt wird, soll die workbench.xmi Datei gelöscht werden. Die anderen Einstellungen sollen erhalten bleiben, siehe #1371
 	 * 
 	 * @param workspaceLocation
 	 */
