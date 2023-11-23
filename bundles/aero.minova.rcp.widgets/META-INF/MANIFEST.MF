@@ -5,7 +5,8 @@ Bundle-SymbolicName: aero.minova.rcp.widgets
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: aero.minova.rcp.widgets
 Bundle-RequiredExecutionEnvironment: JavaSE-17
-Require-Bundle: org.eclipse.jface,
+Require-Bundle: javax.inject,
+ org.eclipse.jface,
  org.eclipse.swt,
  org.eclipse.e4.core.di.extensions,
  org.eclipse.ui.forms,
@@ -15,7 +16,6 @@ Require-Bundle: org.eclipse.jface,
  aero.minova.rcp.constant,
  org.eclipse.e4.core.services,
  aero.minova.rcp.dataservice,
- javax.inject,
  org.eclipse.e4.core.di.annotations,
  org.eclipse.nebula.widgets.opal.textassist,
  aero.minova.rcp.preferencewindow,

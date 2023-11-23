@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class CustomComparator implements Comparator<Object> {
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	@Override
 	public int compare(Object o1, Object o2) {
 		if (o1 == null) {

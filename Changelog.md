@@ -14,8 +14,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+
 ### Neu
 - Knopf zum Zurücksetzten der UI, Übersetzungen ab i18n 12.21.0
+
+
+### Änderungen 
+- Nattable Version 2.2.1 nutzen
 
 
 ## [12.10.0] - 16.10.2023
