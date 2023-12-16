@@ -10,16 +10,10 @@ registries:
     url: https://maven.pkg.github.com/minova-afis
     username: ${{secrets.MAIN_GITHUB_RELEASE_USERNAME}}
     password: ${{secrets.MAIN_GITHUB_RELEASE_TOKEN}}
-  github:
-    type: git
-    url: https://github.com
-    username: ${{secrets.MAIN_GITHUB_RELEASE_USERNAME}}
-    password: ${{secrets.MAIN_GITHUB_RELEASE_TOKEN}}
 updates:
   - package-ecosystem: "maven"
     directory: "/"
-    registries: 
-       - maven-github
+    registries: "*"
     schedule:
       interval: "daily"
     assignees:
@@ -27,11 +21,15 @@ updates:
       - "janiak-minova"
   - package-ecosystem: "github-actions"
     directory: "/"
-    registries:
-      - github
     schedule:
       interval: "daily"
     assignees:
       - "Bauer-David"
       - "janiak-minova"
- 
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "Bauer-David"
+      - "janiak-minova"

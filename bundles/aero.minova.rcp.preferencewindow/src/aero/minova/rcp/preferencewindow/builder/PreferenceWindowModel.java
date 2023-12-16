@@ -102,9 +102,13 @@ public class PreferenceWindowModel {
 	private PreferenceTabDescriptor buildDarstellungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
+
 		ptd = new PreferenceTabDescriptor("Languages", "designTab", translationService.translate("@Preferences.Layout", null), 0.2);
 		psd = new PreferenceSectionDescriptor("GeneralDesign", translationService.translate(PREFERENCES_GENERAL, null), 0.1);
 		ptd.add(psd);
+
+		psd.add(new PreferenceDescriptor("ResetUI", translationService.translate("@Preferences.ResetUI", null), null, 0.1, DisplayType.RESETUIBUTTON, false));
+
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.LOCALE_LANGUAGE, translationService.translate("@Preferences.LocalLanguage", null), null, 0.2,
 				DisplayType.LOCALE, Locale.getDefault().getDisplayLanguage(Locale.getDefault())));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEZONE, translationService.translate("@Preferences.Timezone", null), null, 0.3,
