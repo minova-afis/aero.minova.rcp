@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="WFC" uid="WebFatClient" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.2.1.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="FreeTables" uid="WebFatClient" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.2.1.qualifier" type="features" includeLaunchers="true" autoIncludeRequirements="true">
+
 
    <configIni use="default">
    </configIni>
@@ -18,15 +19,17 @@
    <splash
       location="aero.minova.rcp.rcp" />
    <launcher name="WFC">
-      <macosx icon="/aero.minova.rcp.product/wfc.icns"/>
+      <macosx icon="/aero.minova.rcp.product/FreeTables.icns"/>
       <win useIco="true">
-         <ico path="/aero.minova.rcp.product/wfc.ico"/>
+         <ico path="/aero.minova.rcp.product/FreeTables.ico"/>
          <bmp/>
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
 
    <plugins>
       <plugin id="aero.minova.rcp.rcp"/>
