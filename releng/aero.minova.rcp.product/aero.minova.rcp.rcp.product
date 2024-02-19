@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="FreeTables" uid="WebFatClient" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.2.1.qualifier" type="features" includeLaunchers="true" autoIncludeRequirements="true">
+<product name="Free Tables" uid="WebFatClient" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.2.1.qualifier" type="features" includeLaunchers="true" autoIncludeRequirements="true">
 
    <configIni use="default">
    </configIni>
@@ -17,7 +17,7 @@
 
    <splash
       location="aero.minova.rcp.rcp" />
-   <launcher name="FreeTables">
+   <launcher name="Free Tables">
       <macosx icon="/aero.minova.rcp.product/FreeTables.icns"/>
       <win useIco="true">
          <ico path="/aero.minova.rcp.product/FreeTables.ico"/>
