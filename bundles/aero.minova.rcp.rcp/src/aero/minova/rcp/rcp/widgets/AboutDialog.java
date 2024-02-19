@@ -76,8 +76,8 @@ public class AboutDialog extends TitleAreaDialog {
 		layout.numColumns = 2;
 		layout.verticalSpacing = 1;
 		info.setLayout(layout);
-		Image wfc = resManager.createImage(ImageUtil.getImageDescriptor("WFC.Application", 128));
-		createText(info, wfc, "WebFatClient CoreApplicationService", infoFont, IMessageProvider.INFORMATION);
+		Image wfc = resManager.createImage(ImageUtil.getImageDescriptor("FreeTables.Application", 128));
+		createText(info, wfc, "Free Tables", infoFont, IMessageProvider.INFORMATION);
 		return info;
 	}
 

@@ -45,7 +45,7 @@ import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
 public class LifeCycle {
 
-	private static final String WFC_APPLICATION = "WFC.Application";
+	private static final String FREE_TABLES_APPLICATION = "FreeTables.Application";
 	public static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 
 	ILog logger = Platform.getLog(this.getClass());
@@ -87,10 +87,10 @@ public class LifeCycle {
 		workbenchContext.set(Constants.SETTINGS_PROPERTIES, settings);
 		defaultConnectionString = settings.getProperty(Constants.SETTINGS_DEFAULT_CONNECTION_STRING);
 
-		ImageDescriptor imageDefault = ImageUtil.getImageDescriptor(WFC_APPLICATION, 16);
-		ImageDescriptor imageDefault2 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 32);
-		ImageDescriptor imageDefault3 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 64);
-		ImageDescriptor imageDefault4 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 256);
+		ImageDescriptor imageDefault = ImageUtil.getImageDescriptor(FREE_TABLES_APPLICATION, 16);
+		ImageDescriptor imageDefault2 = ImageUtil.getImageDescriptor(FREE_TABLES_APPLICATION, 32);
+		ImageDescriptor imageDefault3 = ImageUtil.getImageDescriptor(FREE_TABLES_APPLICATION, 64);
+		ImageDescriptor imageDefault4 = ImageUtil.getImageDescriptor(FREE_TABLES_APPLICATION, 256);
 		Window.setDefaultImages(
 				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
 

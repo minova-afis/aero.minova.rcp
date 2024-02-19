@@ -17,7 +17,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Knopf zum Zurücksetzten der UI, Übersetzungen ab i18n 12.21.0
-
+- Icon, Splashscreen und Name der Anwendung in "Free Tables" ändern
 
 ### Änderungen 
 - Nattable Version 2.2.1 nutzen
