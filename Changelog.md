@@ -17,6 +17,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Knopf zum Zurücksetzten der UI, Übersetzungen ab i18n 12.21.0
+- Fehlermeldung anzeigen, wenn beim Initialisieren eines Helpers Fehler auftritt, Übersetzung ab i18n 12.22.0
 
 
 ### Änderungen 
