@@ -42,6 +42,7 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 		int i = 0;
 		for (Column column : columns) {
 			if (column.getType().equals(DataType.BOOLEAN)) {
+				configureIntegerCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
 				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null) {
 				configureShortDateCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
@@ -78,7 +79,12 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 					break;
 
 				case COUNT:
-					summaryProvider = (columnIndex, children) -> children.size();
+
+					if (column.getType().equals(DataType.BOOLEAN)) {
+						summaryProvider = this::getBooleanSum;
+					} else {
+						summaryProvider = (columnIndex, children) -> children.size();
+					}
 					break;
 
 				case MAX:
@@ -140,6 +146,16 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 			}
 		}
 		return max;
+	}
+
+	private Object getBooleanSum(int columnIndex, List<Row> children) {
+		int sum = 0;
+		for (Row r : children) {
+			if (r.getValue(columnIndex) != null && Boolean.TRUE.equals(r.getValue(columnIndex).getBooleanValue())) {
+				sum++;
+			}
+		}
+		return sum;
 	}
 
 	private double sumRows(int columnIndex, List<Row> children) {

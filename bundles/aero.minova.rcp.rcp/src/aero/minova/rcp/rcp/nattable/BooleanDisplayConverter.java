@@ -9,7 +9,7 @@ public class BooleanDisplayConverter extends DefaultBooleanDisplayConverter {
 		if (displayValue == null) {
 			return null;
 		} else {
-			return Boolean.valueOf(displayValue.toString());
+			return displayValue;
 		}
 	}
 }
