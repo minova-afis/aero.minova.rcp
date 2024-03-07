@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.nattable;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -78,7 +79,12 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 					break;
 
 				case COUNT:
-					summaryProvider = (columnIndex, children) -> children.size();
+
+					if (column.getType().equals(DataType.BOOLEAN)) {
+						summaryProvider = this::getBooleanSum;
+					} else {
+						summaryProvider = (columnIndex, children) -> children.size();
+					}
 					break;
 
 				case MAX:
@@ -140,6 +146,16 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 			}
 		}
 		return max;
+	}
+
+	private Object getBooleanSum(int columnIndex, List<Row> children) {
+		int sum = 0;
+		for (Row r : children) {
+			if (r.getValue(columnIndex) != null && Objects.equals(true, r.getValue(columnIndex).getBooleanValue())) {
+				sum++;
+			}
+		}
+		return sum;
 	}
 
 	private double sumRows(int columnIndex, List<Row> children) {
