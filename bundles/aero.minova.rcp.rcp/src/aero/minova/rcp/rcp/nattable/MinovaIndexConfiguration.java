@@ -3,7 +3,6 @@ package aero.minova.rcp.rcp.nattable;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -43,6 +42,7 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 		int i = 0;
 		for (Column column : columns) {
 			if (column.getType().equals(DataType.BOOLEAN)) {
+				configureIntegerCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
 				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null) {
 				configureShortDateCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
@@ -151,7 +151,7 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 	private Object getBooleanSum(int columnIndex, List<Row> children) {
 		int sum = 0;
 		for (Row r : children) {
-			if (r.getValue(columnIndex) != null && Objects.equals(true, r.getValue(columnIndex).getBooleanValue())) {
+			if (r.getValue(columnIndex) != null && Boolean.TRUE.equals(r.getValue(columnIndex).getBooleanValue())) {
 				sum++;
 			}
 		}
