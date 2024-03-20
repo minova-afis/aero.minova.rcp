@@ -15,10 +15,15 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Neu
+
+### Änderungen 
+
+## [12.10.1] - 20.03.2024
+
+### Neu
 - Knopf zum Zurücksetzten der UI, Übersetzungen ab i18n 12.21.0
 - Fehlermeldung anzeigen, wenn beim Initialisieren eines Helpers Fehler auftritt, Übersetzung ab i18n 12.22.0
 - Bei Boolean-Spalten und aggregate="COUNT" nur true-Werte zählen
-
 
 ### Änderungen 
 - Nattable Version 2.2.1 nutzen
