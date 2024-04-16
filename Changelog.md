@@ -16,6 +16,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 
+- Icon, Splashscreen und Name der Anwendung in "Free Tables" ändern
+
 ### Änderungen 
 
 ## [12.10.1] - 20.03.2024

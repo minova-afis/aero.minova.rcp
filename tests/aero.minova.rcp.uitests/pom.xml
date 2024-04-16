@@ -2,10 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>aero.minova.rcp</groupId>
     <artifactId>aero.minova.rcp.uitests</artifactId>
-    <version>12.10.1-SNAPSHOT</version>
-
     <packaging>eclipse-test-plugin</packaging>
 
     <parent>
