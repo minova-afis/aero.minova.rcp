@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.rcp.nattable;
 
 import java.util.List;
 
@@ -20,9 +20,9 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import ca.odell.glazedlists.SortedList;
 
-public class NattableSummaryUtil {
+public class SummaryRowUtil {
 
-	private NattableSummaryUtil() {}
+	private SummaryRowUtil() {}
 
 	public static void configureSummary(Form form, NatTable natTable, SortedList<Row> sortedList, MinovaColumnPropertyAccessor columnPropertyAccessor) {
 		List<ColumnWrapper> columns = form.getIndexView().getColumn().stream().map(c -> new ColumnWrapper(c.getAggregate(), c.isTotal())).toList();
@@ -99,7 +99,25 @@ public class NattableSummaryUtil {
 
 		@Override
 		public Object summarize(int columnIndex) {
-			return this.dataProvider.getRowCount();
+			int rowCount = this.dataProvider.getRowCount();
+			int valueRows = 0;
+			int sum = 0;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Boolean b) {
+					valueRows++;
+					if (Boolean.TRUE.equals(b)) {
+						sum++;
+					}
+				}
+			}
+			if (valueRows == 0) {
+				// Keine Boolean Spalte -> Anzahl Zeilen
+				return rowCount;
+			}
+			return sum;
 		}
 	}
 

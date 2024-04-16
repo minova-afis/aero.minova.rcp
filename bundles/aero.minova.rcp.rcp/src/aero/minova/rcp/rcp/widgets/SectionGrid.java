@@ -120,9 +120,9 @@ import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationConfiguration;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
+import aero.minova.rcp.rcp.nattable.SummaryRowUtil;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.util.CustomComparator;
-import aero.minova.rcp.rcp.util.NattableSummaryUtil;
 import aero.minova.rcp.rcp.util.StaticXBSValueUtil;
 import aero.minova.rcp.util.OSUtil;
 import ca.odell.glazedlists.EventList;
@@ -414,7 +414,7 @@ public class SectionGrid {
 
 		ILayer bodyLayer;
 		ILayer rowHeaderLayer;
-		if (NattableSummaryUtil.needsSummary(grid)) {
+		if (SummaryRowUtil.needsSummary(grid)) {
 			// build the Summary Row
 			FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(eventLayer, viewportLayer, configRegistry, false);
 			summaryRowLayer.setHorizontalCompositeDependency(false);
@@ -502,8 +502,8 @@ public class SectionGrid {
 			}
 		});
 
-		if (NattableSummaryUtil.needsSummary(grid)) {
-			NattableSummaryUtil.configureSummary(grid, natTable, sortedList, columnPropertyAccessor);
+		if (SummaryRowUtil.needsSummary(grid)) {
+			SummaryRowUtil.configureSummary(grid, natTable, sortedList, columnPropertyAccessor);
 		}
 
 		FormData fd = new FormData();
