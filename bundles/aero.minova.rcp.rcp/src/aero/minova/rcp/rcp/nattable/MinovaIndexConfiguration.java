@@ -83,7 +83,9 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 					if (column.getType().equals(DataType.BOOLEAN)) {
 						summaryProvider = this::getBooleanSum;
 					} else {
-						summaryProvider = (columnIndex, children) -> children.size();
+						// Nur Zeilen mit nicht-null Value zählen
+						summaryProvider = (columnIndex, children) -> children.stream()
+								.filter(r -> r.getValue(columnIndex) != null && r.getValue(columnIndex).getValue() != null).count();
 					}
 					break;
 
@@ -167,6 +169,8 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 				total += r.getValue(columnIndex).getDoubleValue();
 			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getBigDecimalValue() != null) {
 				total += r.getValue(columnIndex).getBigDecimalValue();
+			} else if (r.getValue(columnIndex) != null && Boolean.TRUE.equals(r.getValue(columnIndex).getBooleanValue())) {
+				total++;
 			}
 		}
 		return total;

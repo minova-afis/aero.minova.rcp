@@ -11,7 +11,6 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.summaryrow.ISummaryProvider;
 import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
-import org.eclipse.nebula.widgets.nattable.summaryrow.SummationSummaryProvider;
 
 import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -66,7 +65,7 @@ public class SummaryRowUtil {
 							summaryProvider = new MinSummaryProvider(summaryDataProvider);
 							break;
 						case SUM:
-							summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
+							summaryProvider = new SumSummaryProvider(summaryDataProvider);
 							break;
 						default:
 							break;
@@ -75,7 +74,7 @@ public class SummaryRowUtil {
 
 					// Summe ("total" in .xml)
 					if (cw.total) {
-						summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
+						summaryProvider = new SumSummaryProvider(summaryDataProvider);
 					}
 
 					if (summaryProvider != null) {
@@ -101,23 +100,30 @@ public class SummaryRowUtil {
 		public Object summarize(int columnIndex) {
 			int rowCount = this.dataProvider.getRowCount();
 			int valueRows = 0;
-			int sum = 0;
+			int count = 0;
 
+			// Überprüfen ob Boolean-Spalte -> nur TRUE Werte
 			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
-				// this check is necessary because of the GroupByObject
 				if (dataValue instanceof Boolean b) {
 					valueRows++;
 					if (Boolean.TRUE.equals(b)) {
-						sum++;
+						count++;
 					}
 				}
 			}
+
 			if (valueRows == 0) {
-				// Keine Boolean Spalte -> Anzahl Zeilen
-				return rowCount;
+				// Keine Boolean Spalte -> Anzahl Zeilen mit Wert != null
+				count = 0;
+				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+					Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+					if (dataValue != null && !(dataValue instanceof String s && s.isBlank())) {
+						count++;
+					}
+				}
 			}
-			return sum;
+			return count;
 		}
 	}
 
@@ -201,6 +207,33 @@ public class SummaryRowUtil {
 				return 0;
 			}
 			return max;
+		}
+	}
+
+	static class SumSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public SumSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			double summaryValue = 0;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+
+				if (dataValue instanceof Number n) {
+					summaryValue += n.doubleValue();
+				} else if (dataValue instanceof Boolean b && Boolean.TRUE.equals(b)) {
+					summaryValue++;
+				}
+			}
+
+			return summaryValue;
 		}
 	}
 

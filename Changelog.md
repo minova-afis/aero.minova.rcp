@@ -20,6 +20,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Änderungen 
 
+- Bei Boolean-Spalten und aggregate="SUM" nur true Werte zählen
+- Bei aggregate="COUNT" nur nicht-null Werte zählen
+
+
 ## [12.10.1] - 20.03.2024
 
 ### Neu
