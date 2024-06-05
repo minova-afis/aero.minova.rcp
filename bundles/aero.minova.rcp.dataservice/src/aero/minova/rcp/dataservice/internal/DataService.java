@@ -231,7 +231,7 @@ public class DataService implements IDataService {
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer Table:\n" + t.body());
 
-			if (checkForError(t.body(), searchTable.getName())) {
+			if (checkForError(t.body(), searchTable.getName(), true)) {
 				return null;
 			}
 
@@ -259,7 +259,7 @@ public class DataService implements IDataService {
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer Call Transaction List:\n" + t.body());
 
-			if (checkForError(t.body(), procedureList.get(0).getTable().getName())) {
+			if (checkForError(t.body(), procedureList.get(0).getTable().getName(), true)) {
 				return null;
 			}
 
@@ -306,7 +306,7 @@ public class DataService implements IDataService {
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer Call Procedure:\n" + t.body());
 
-			if (checkForError(t.body(), table.getName())) {
+			if (checkForError(t.body(), table.getName(), true)) {
 				return null;
 			}
 
@@ -325,7 +325,7 @@ public class DataService implements IDataService {
 	 * @param sourceName
 	 * @return
 	 */
-	private boolean checkForError(String body, String sourceName) {
+	private boolean checkForError(String body, String sourceName, boolean showError) {
 
 		ErrorObject e = null;
 
@@ -361,7 +361,9 @@ public class DataService implements IDataService {
 		}
 
 		if (e != null) {
-			postError(e);
+			if (showError) {
+				postError(e);
+			}
 			return true;
 		}
 		return false;
@@ -445,7 +447,7 @@ public class DataService implements IDataService {
 			log("CAS Answer XML Detail:\nPath: " + finalPath + "\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 
-			if (checkForError(t.body(), table.getName())) {
+			if (checkForError(t.body(), table.getName(), true)) {
 				return null;
 			}
 
@@ -578,7 +580,7 @@ public class DataService implements IDataService {
 		// Überprüfen, ob ein Fehler geworfen wurde (dann wird SqlProcedureResult zurückgegeben)
 		try {
 			String asString = new String(t.body(), StandardCharsets.UTF_8);
-			if (checkForError(asString, fileName)) {
+			if (checkForError(asString, fileName, true)) {
 				log("CAS Answer " + method + ":\n" + asString);
 				return true;
 			}
@@ -649,10 +651,34 @@ public class DataService implements IDataService {
 
 		return sendRequest.thenApply(response -> {
 			log("CAS Answer Server Hash for File:\n" + response.body());
-			if (checkForError(response.body(), filename)) {
+			if (checkForError(response.body(), filename, true)) {
 				return null;
 			}
 
+			return response.body();
+		});
+	}
+
+	@Override
+	public CompletableFuture<String> getCASLabel() {
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("label"))//
+				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
+
+		log("CAS Request Server Label:\n" + request);
+
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, "Server Label", false);
+			return null;
+		});
+
+		return sendRequest.thenApply(response -> {
+			log("CAS Answer Server Label:\n" + response.body());
+			if (checkForError(response.body(), "CAS Label", false)) {
+				return server.toString();
+			}
 			return response.body();
 		});
 	}
