@@ -110,6 +110,13 @@ public interface IDataService {
 	 */
 	CompletableFuture<Value> getSQLValue(String tablename, String requestColumn, Value requestValue, String resultColumn, DataType resultType);
 
+	/**
+	 * Fragt die Bezeichnung des verbundenen CAS zurück. Ist kein Label definiert wird die URL zurückgegeben
+	 * 
+	 * @return
+	 */
+	CompletableFuture<String> getCASLabel();
+
 	CompletableFuture<String> getHashedFile(String filename);
 
 	boolean checkIfUpdateIsRequired(String fileName) throws IOException, InterruptedException;

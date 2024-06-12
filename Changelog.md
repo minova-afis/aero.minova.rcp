@@ -17,6 +17,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Neu
 
 - Icon, Splashscreen und Name der Anwendung in "Free Tables" ändern
+- Bezeichnung des konfigurierten CAS laden und im Hauptfenster anzeigen. Ist keine Bezeichnung konfiguriert wird die URL angezeigt
 
 ### Änderungen 
 
