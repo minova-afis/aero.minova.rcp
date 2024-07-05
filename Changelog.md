@@ -12,7 +12,7 @@ Mögliche Tags für Änderungen:
 
 Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenotes](https://github.com/minova-afis/aero.minova.rcp/releases) kopiert.
 
-## [Unreleased]
+## [12.11.0] - 05.07.2024
 
 ### Neu
 
