@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.12.0] - 10.07.2024
+
 ### Neu
 
 - Einloggen über ein Default-Profil ermöglichen
