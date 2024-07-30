@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.12.1] - 10.07.2024
+
 ### Bugfixes
 - Auslesen von DefaultProfile.properties unter Windows korrigieren
 
