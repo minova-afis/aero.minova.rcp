@@ -118,4 +118,15 @@ public class WorkspaceAccessPreferences {
 					}
 				}).findFirst();
 	}
+
+	public static Optional<ISecurePreferences> getWorkspaceAccessDataByName(String name) {
+		return getSavedWorkspaceAccessData().stream()//
+				.filter(w -> {
+					try {
+						return w.get(PROFILE, "").equals(name);
+					} catch (StorageException e) {
+						throw new RuntimeException(e);
+					}
+				}).findFirst();
+	}
 }

@@ -12,6 +12,12 @@ Mögliche Tags für Änderungen:
 
 Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenotes](https://github.com/minova-afis/aero.minova.rcp/releases) kopiert.
 
+## Unreleased
+
+### Neu
+
+- Einloggen über ein Default-Profil ermöglichen
+
 ## [12.11.0] - 05.07.2024
 
 ### Neu

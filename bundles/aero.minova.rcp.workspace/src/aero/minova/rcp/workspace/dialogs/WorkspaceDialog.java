@@ -12,8 +12,6 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.equinox.security.storage.StorageException;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -38,7 +36,7 @@ import aero.minova.rcp.util.OSUtil;
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
-public class WorkspaceDialog extends Dialog {
+public class WorkspaceDialog extends MinovaWorkspaceDialog {
 
 	private Text username;
 	private Text password;
@@ -251,17 +249,6 @@ public class WorkspaceDialog extends Dialog {
 	}
 
 	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-		Button btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
-		btnOK.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				okPressed();
-			}
-		});
-	}
-
-	@Override
 	protected void okPressed() {
 		WorkspaceHandler workspaceHandler = null;
 		try {
@@ -282,14 +269,17 @@ public class WorkspaceDialog extends Dialog {
 		super.okPressed();
 	}
 
+	@Override
 	public String getUsername() {
 		return usernameText;
 	}
 
+	@Override
 	public String getPassword() {
 		return pwText;
 	}
 
+	@Override
 	public String getConnection() {
 		return connectionText;
 	}
@@ -303,6 +293,7 @@ public class WorkspaceDialog extends Dialog {
 		}
 	}
 
+	@Override
 	public void setDefaultConnectionString(String defaultConnectionString) {
 		this.defaultConnectionString = defaultConnectionString;
 	}
@@ -314,6 +305,11 @@ public class WorkspaceDialog extends Dialog {
 			applicationContext.applicationRunning();
 		}
 		return super.open();
+	}
+
+	@Override
+	public String getProfile() {
+		return profileName;
 	}
 
 }
