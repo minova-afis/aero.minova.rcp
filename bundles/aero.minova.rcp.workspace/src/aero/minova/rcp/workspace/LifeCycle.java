@@ -146,11 +146,7 @@ public class LifeCycle {
 
 		// Wenn es die Datei "DefaultProfile.properties" gibt entsprechenden Dialog öffnen, siehe #1579
 		try {
-			File jarFile = new File(LifeCycle.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-			Path parent = OSUtil.isMac() ? //
-					Paths.get(jarFile.getPath()).getParent().getParent().getParent().getParent().getParent() : //
-					Paths.get(jarFile.getPath()).getParent().getParent().getParent();
-			File propertiesFile = parent.resolve("DefaultProfile.properties").toFile();
+			File propertiesFile = new File(OSUtil.isMac() ? "../../../DefaultProfile.properties" : "../DefaultProfile.properties");
 			if (propertiesFile.exists()) {
 				Properties properties = new Properties();
 				try (BufferedInputStream targetStream = new BufferedInputStream(new FileInputStream(propertiesFile))) {
@@ -160,7 +156,7 @@ public class LifeCycle {
 				}
 				return new DefaultProfileWorkspaceDialog(null, applicationContext, properties);
 			}
-		} catch (URISyntaxException e) {
+		} catch (Exception e) {
 			logger.error("Error finding DefaultProfile.properties file", e);
 		}
 
