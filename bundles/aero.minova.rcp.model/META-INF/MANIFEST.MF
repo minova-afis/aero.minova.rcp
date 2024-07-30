@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Model
 Bundle-SymbolicName: aero.minova.rcp.model
-Bundle-Version: 12.12.0.qualifier
+Bundle-Version: 12.12.1.qualifier
 Automatic-Module-Name: aero.minova.rcp.plugin1
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.osgi,
