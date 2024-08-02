@@ -111,6 +111,7 @@ import aero.minova.rcp.model.form.IButtonAccessor;
 import aero.minova.rcp.model.form.IGridValidator;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.ButtonAccessor;
@@ -163,6 +164,7 @@ public class SectionGrid {
 	private NatTable natTable;
 	private Table dataTable;
 	private Grid grid;
+	private MGrid mGrid;
 	private Composite composite;
 	private MinovaSection section;
 	private MDetail mDetail;
@@ -444,7 +446,7 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService, translationService);
+		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), mGrid.getFields(), dataService, translationService);
 		getNatTable().addConfiguration(gridConfiguration);
 		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
@@ -976,6 +978,14 @@ public class SectionGrid {
 
 	public void updateGridLookupValues() {
 		gridConfiguration.updateContentProvider();
+	}
+
+	public MGrid getmGrid() {
+		return mGrid;
+	}
+
+	public void setmGrid(MGrid mGrid) {
+		this.mGrid = mGrid;
 	}
 
 }

@@ -14,7 +14,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.event.GridChangeListener;
 
-public class MGrid {
+public class MGrid extends MParent {
 
 	public MGrid(String id) {
 		this.id = id;
@@ -343,5 +343,15 @@ public class MGrid {
 
 	public void setExecuteAlways(boolean executeAlways) {
 		this.executeAlways = executeAlways;
+	}
+
+	@Override
+	public MField getField(String name) {
+		for (MField f : fields) {
+			if (f.getName().equalsIgnoreCase(name)) {
+				return f;
+			}
+		}
+		return null;
 	}
 }

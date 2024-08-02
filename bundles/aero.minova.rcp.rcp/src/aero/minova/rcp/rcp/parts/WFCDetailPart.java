@@ -622,6 +622,7 @@ public class WFCDetailPart extends WFCFormPart {
 		for (Field f : grid.getField()) {
 			try {
 				MField mF = ModelToViewModel.convert(f, locale);
+				mF.setParent(mgrid);
 				mFields.add(mF);
 			} catch (NullPointerException e) {
 				showErrorMissingSQLIndex(f, grid.getId() + "." + f.getName(), e);
@@ -763,6 +764,7 @@ public class WFCDetailPart extends WFCFormPart {
 	private void createGrid(Composite composite, MSection mSection, MinovaSection section, IEclipseContext context, Object fieldOrGrid) {
 		SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 		MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
+		sg.setmGrid(mGrid);
 		mGrid.addGridChangeListener(dirtyFlagUtil);
 		GridAccessor gA = new GridAccessor(mGrid);
 		gA.setSectionGrid(sg);

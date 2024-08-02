@@ -198,9 +198,6 @@ public class DataFormService implements IDataFormService {
 		c.setRequired(f.isRequired());
 		c.setKeyType(Arrays.stream(KeyType.values()).filter(e -> e.name().equalsIgnoreCase(f.getKeyType())).findAny().orElse(null));
 		c.setLookup(f.getLookup() != null);
-		if (f.getLookup() != null) {
-			c.setLookupTable(f.getLookup().getTable());
-		}
 		c.setVisible(f.isVisible());
 
 		return c;

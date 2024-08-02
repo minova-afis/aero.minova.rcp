@@ -724,11 +724,6 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache) {
-		return getLookupValuesFromTable(tableName, Constants.TABLE_DESCRIPTION, null, null, true, useCache, false);
-	}
-
-	@Override
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache) {
 		boolean useCacheLookup = false; // siehe #707
 		if (field.getLookupTable() != null) {
@@ -852,7 +847,7 @@ public class DataService implements IDataService {
 
 			if (field.getLookupParameters() != null && field.isUseResolveParms()) {
 				for (String paramName : field.getLookupParameters()) {
-					MField paramField = field.getDetail().getField(paramName);
+					MField paramField = field.getParent().getField(paramName);
 					t.addColumn(new Column(paramName, paramField.getDataType()));
 					row.addValue(paramField.getValue());
 				}
@@ -864,7 +859,7 @@ public class DataService implements IDataService {
 			row.addValue(new Value(field.isFilterLastAction())); // Bei List FilterLastAction nach Einstellung in Maske (default true) #1482
 			if (field.getLookupParameters() != null) {
 				for (String paramName : field.getLookupParameters()) {
-					MField paramField = field.getDetail().getField(paramName);
+					MField paramField = field.getParent().getField(paramName);
 					t.addColumn(new Column(paramName, paramField.getDataType()));
 					row.addValue(paramField.getValue());
 				}

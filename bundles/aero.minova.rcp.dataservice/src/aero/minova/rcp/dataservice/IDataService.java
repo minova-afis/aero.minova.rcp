@@ -62,8 +62,6 @@ public interface IDataService {
 	 */
 	CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText);
 
-	CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache);
-
 	/**
 	 * Diese Methode liefert alle möglichen Werte für das gegebene Lookup.
 	 *

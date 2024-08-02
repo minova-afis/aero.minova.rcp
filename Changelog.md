@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Neu
+- Prozeduren in Grid-Lookups ermöglichen
+
 ## [12.12.1] - 10.07.2024
 
 ### Bugfixes
