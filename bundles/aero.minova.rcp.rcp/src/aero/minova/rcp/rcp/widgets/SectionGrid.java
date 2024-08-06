@@ -229,7 +229,7 @@ public class SectionGrid {
 		loadState();
 
 		for (int i = 0; i < dataTable.getColumnCount(); i++) {
-			originalReadOnlyColumns.put(i, dataTable.getColumns().get(i).isReadOnly());
+			originalReadOnlyColumns.put(i, dataTable.getColumns().get(i).isReadOnly() || grid.isReadOnly());
 			originalRequiredColumns.put(i, dataTable.getColumns().get(i).isRequired());
 		}
 	}
@@ -382,6 +382,8 @@ public class SectionGrid {
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 
 		// Delete Button updaten (nur aktiviert, wenn eine Zelle gewählt ist)
+		deleteToolItemAccessor.setCanBeEnabled(false); // Erst mal Löschen deaktivieren
+		deleteToolItemAccessor.updateEnabled();
 		selectionLayer.addLayerListener(event -> {
 			if (deleteToolItemAccessor != null && event instanceof ISelectionEvent) {
 				deleteToolItemAccessor.setCanBeEnabled(selectionLayer.getSelectedCellPositions().length > 0);
