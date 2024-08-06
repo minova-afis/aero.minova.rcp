@@ -846,11 +846,7 @@ public class DataService implements IDataService {
 			row.addValue(new Value(false)); // Bei Resolve nie nach LastAction filtern #1482
 
 			if (field.getLookupParameters() != null && field.isUseResolveParms()) {
-				for (String paramName : field.getLookupParameters()) {
-					MField paramField = field.getParent().getField(paramName);
-					t.addColumn(new Column(paramName, paramField.getDataType()));
-					row.addValue(paramField.getValue());
-				}
+				addParameterValues(field, t, row);
 			}
 		} else {
 			t.addColumn(new Column(Constants.TABLE_COUNT, DataType.INTEGER));
@@ -858,16 +854,20 @@ public class DataService implements IDataService {
 			t.addColumn(new Column(Constants.TABLE_FILTERLASTACTION, DataType.BOOLEAN));
 			row.addValue(new Value(field.isFilterLastAction())); // Bei List FilterLastAction nach Einstellung in Maske (default true) #1482
 			if (field.getLookupParameters() != null) {
-				for (String paramName : field.getLookupParameters()) {
-					MField paramField = field.getParent().getField(paramName);
-					t.addColumn(new Column(paramName, paramField.getDataType()));
-					row.addValue(paramField.getValue());
-				}
+				addParameterValues(field, t, row);
 			}
 		}
 
 		t.addRow(row);
 		return t;
+	}
+
+	private void addParameterValues(MField field, Table t, Row row) {
+		for (String paramName : field.getLookupParameters()) {
+			MField paramField = field.getParent().getField(paramName);
+			t.addColumn(new Column(paramName, paramField.getDataType()));
+			row.addValue(paramField.getValue());
+		}
 	}
 
 	private List<LookupValue> handleLookupFromProcedureResponse(String procedureName, List<LookupValue> list, HashMap<Integer, LookupValue> map,
