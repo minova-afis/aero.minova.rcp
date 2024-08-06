@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Bugfixes
 - Buttonevents auch in OPs suchen
+- Blockieren in Masken ohne KeyLong ermöglichen
 
 ## [12.12.1] - 10.07.2024
 
