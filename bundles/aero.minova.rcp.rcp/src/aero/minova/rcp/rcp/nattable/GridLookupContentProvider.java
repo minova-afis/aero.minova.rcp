@@ -8,18 +8,19 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.LookupValue;
+import aero.minova.rcp.model.form.MLookupField;
 
 public class GridLookupContentProvider {
 
 	TranslationService translationService;
 	List<LookupValue> values;
 	IDataService dataService;
-	String tableName;
+	MLookupField mField;
 
-	public GridLookupContentProvider(IDataService dataService, String tablename, TranslationService translationService) {
+	public GridLookupContentProvider(IDataService dataService, MLookupField mField, TranslationService translationService) {
 		values = new ArrayList<>();
 		this.dataService = dataService;
-		this.tableName = tablename;
+		this.mField = mField;
 		this.translationService = translationService;
 		update();
 	}
@@ -29,7 +30,7 @@ public class GridLookupContentProvider {
 	}
 
 	public void update() {
-		CompletableFuture<List<LookupValue>> listLookup = dataService.resolveGridLookup(tableName, true);
+		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(mField, true);
 
 		listLookup.thenAccept(l -> {
 			values.clear();
@@ -39,7 +40,7 @@ public class GridLookupContentProvider {
 	}
 
 	public void translateAllLookups() {
-		if (tableName != null) {
+		if (getTableOrProcedureName() != null) {
 			for (LookupValue lv : values) {
 				translateLookup(lv);
 			}
@@ -47,13 +48,21 @@ public class GridLookupContentProvider {
 	}
 
 	public void translateLookup(LookupValue lv) {
-		String translateKey = tableName + ".KeyText." + lv.keyLong;
-		String translated = translationService.translate("@" + tableName + ".KeyText." + lv.keyLong, null);
+		String translateKey = getTableOrProcedureName() + ".KeyText." + lv.keyLong;
+		String translated = translationService.translate("@" + getTableOrProcedureName() + ".KeyText." + lv.keyLong, null);
 		lv.keyText = translateKey.equals(translated) ? lv.keyText : translated;
 
-		translateKey = tableName + ".Description." + lv.keyLong;
-		translated = translationService.translate("@" + tableName + ".Description." + lv.keyLong, null);
+		translateKey = getTableOrProcedureName() + ".Description." + lv.keyLong;
+		translated = translationService.translate("@" + getTableOrProcedureName() + ".Description." + lv.keyLong, null);
 		lv.description = translateKey.equals(translated) ? lv.description : translated;
+	}
+
+	private String getTableOrProcedureName() {
+		if (mField.getLookupTable() != null) {
+			return mField.getLookupTable();
+		} else {
+			return mField.getLookupProcedurePrefix();
+		}
 	}
 
 }

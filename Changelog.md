@@ -14,8 +14,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+
 ### Neu
 - Attribut "reload-detail" für onclick events
+- Prozeduren in Grid-Lookups ermöglichen
 
 ### Bugfixes
 - Buttonevents auch in OPs suchen

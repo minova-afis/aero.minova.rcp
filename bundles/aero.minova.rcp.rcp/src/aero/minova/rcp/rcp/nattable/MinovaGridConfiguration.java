@@ -33,28 +33,32 @@ import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.DateTimeType;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 
 public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	private List<Column> columns;
+	private List<MField> fields;
+	private Map<String, MField> gridFields;
 	private Locale locale = CustomLocale.getLocale();
-	private Grid grid;
-	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
 	private IDataService dataService;
 	private List<String> readOnlyColumns;
 	private IConfigRegistry configRegistry;
 	private List<GridLookupContentProvider> contentProviderList;
 	private TranslationService translationService;
+	private boolean gridIsReadOnly;
 
-	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService, TranslationService translationService) {
+	public MinovaGridConfiguration(List<Column> columns, List<MField> fields, IDataService dataService, TranslationService translationService,
+			boolean gridIsReadOnly) {
 		this.columns = columns;
-		this.grid = grid;
+		this.fields = fields;
 		this.dataService = dataService;
+		this.gridIsReadOnly = gridIsReadOnly;
 		this.readOnlyColumns = new ArrayList<>();
 		this.contentProviderList = new ArrayList<>();
 		this.translationService = translationService;
@@ -63,7 +67,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	public void initGridFields() {
 		gridFields = new HashMap<>();
-		for (aero.minova.rcp.form.model.xsd.Field field : grid.getField()) {
+		for (MField field : fields) {
 			gridFields.put(field.getName(), field);
 		}
 	}
@@ -112,8 +116,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	public List<Integer> getHiddenColumns() {
 		List<Integer> hiddenCols = new ArrayList<>();
-		for (int i = 0; i < grid.getField().size(); i++) {
-			Field f = grid.getField().get(i);
+		for (int i = 0; i < fields.size(); i++) {
+			MField f = fields.get(i);
 			if (!f.isVisible()) {
 				hiddenCols.add(i);
 			}
@@ -127,23 +131,31 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 			configureSummary(configRegistry, i);
 
-			boolean isReadOnly = column.isReadOnly() || grid.isReadOnly();
+			boolean isReadOnly = column.isReadOnly() || gridIsReadOnly;
 
 			if (column.isLookup()) {
-				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired(), column.getLookupTable());
+				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired(),
+						gridFields.get(column.getName()));
+
 			} else if (column.getType().equals(DataType.BOOLEAN)) {
 				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
-			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getShortDate() != null) {
+
+			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTimeType().equals(DateTimeType.DATE)) {
 				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
-			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getShortTime() != null) {
+
+			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTimeType().equals(DateTimeType.TIME)) {
 				configureShortTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
-			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTime() != null) {
+
+			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTimeType().equals(DateTimeType.DATETIME)) {
 				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
+
 			} else if (column.getType().equals(DataType.DOUBLE) || column.getType().equals(DataType.BIGDECIMAL)) {
 				configureDoubleCell(configRegistry, i++, gridFields.get(column.getName()), ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly,
 						column.isRequired());
+
 			} else if (column.getType().equals(DataType.INTEGER)) {
 				configureIntegerCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
+
 			} else {
 				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
 			}
@@ -178,12 +190,13 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	}
 
 	private void configureLookupCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired,
-			String lookupTable) {
+			MField mField) {
+
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 
-		GridLookupContentProvider contentProvider = new GridLookupContentProvider(dataService, lookupTable, translationService);
+		GridLookupContentProvider contentProvider = new GridLookupContentProvider(dataService, (MLookupField) mField, translationService);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new LookupDisplayConverter(contentProvider), DisplayMode.NORMAL,
 				configLabel + columnIndex);
 
@@ -350,16 +363,12 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		}
 	}
 
-	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, aero.minova.rcp.form.model.xsd.Field field, String configLabel,
-			boolean isReadOnly, boolean isRequired) {
+	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, MField mField, String configLabel, boolean isReadOnly,
+			boolean isRequired) {
 
 		int decimals = 0;
-		if (field.getNumber() != null) {
-			decimals = field.getNumber().getDecimals();
-		} else if (field.getPercentage() != null) {
-			decimals = field.getPercentage().getDecimals();
-		} else if (field.getMoney() != null) {
-			decimals = field.getMoney().getDecimals();
+		if (mField.getDecimals() != null) {
+			decimals = mField.getDecimals();
 		}
 
 		Style cellStyle = new Style();

@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.model.PeriodValue;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.widgets.PeriodComposite;
@@ -42,13 +43,13 @@ public class PeriodValueAccessor extends AbstractValueAccessor {
 				setFocussed(false);
 				// Überprüfung ob der eingetragenen Wert in der Liste ist und ebenfalls gültig!
 				field.setValue(field.getValue(), false);
-				((DetailAccessor) field.getDetail().getDetailAccessor()).setSelectedControl(null);
+				((DetailAccessor) ((MDetail) field.getParent()).getDetailAccessor()).setSelectedControl(null);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
 				setFocussed(true);
-				((DetailAccessor) field.getDetail().getDetailAccessor()).setSelectedControl(control);
+				((DetailAccessor) ((MDetail) field.getParent()).getDetailAccessor()).setSelectedControl(control);
 			}
 		});
 	}

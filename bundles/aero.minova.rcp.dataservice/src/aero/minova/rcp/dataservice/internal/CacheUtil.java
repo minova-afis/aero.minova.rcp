@@ -14,7 +14,7 @@ public class CacheUtil {
 		StringBuilder hashName = new StringBuilder(field.getLookupProcedurePrefix() + "[");
 
 		for (String paramName : field.getLookupParameters()) {
-			MField paramField = field.getDetail().getField(paramName);
+			MField paramField = field.getParent().getField(paramName);
 			hashName.append("(" + paramField.getValue() + "),");
 		}
 

@@ -66,7 +66,7 @@ public class RadioField {
 			double indexInList = radioField.getRadiobuttons().indexOf(b);
 			Button button = ButtonFactory.newButton(SWT.RADIO).text(optionLabel).create(comp);
 
-			b.setDetail(field.getDetail());
+			b.setParent(field.getParent());
 
 			// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 			IEclipseContext context = perspective.getContext();

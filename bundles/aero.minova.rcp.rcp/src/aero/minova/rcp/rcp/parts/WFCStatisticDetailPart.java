@@ -258,7 +258,7 @@ public class WFCStatisticDetailPart {
 			mField.setSqlIndex(Integer.parseInt(n.getName().substring(5, n.getName().length())));
 			mField.setNumberColumnsSpanned(4);
 			mField.setNumberRowsSpanned(1);
-			mField.setDetail(mDetail);
+			mField.setParent(mDetail);
 			mField.setMSection(mSection);
 			mField.setVisible(true);
 			mFields.add(mField);
