@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.13.1] - 06.08.2024
+
 ### Bugfixes
 - Grids ohne Löschen-Button wieder ermöglichen
 
