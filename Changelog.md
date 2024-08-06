@@ -14,9 +14,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Neu
+- Attribut "reload-detail" für onclick events
+
 ### Bugfixes
 - Buttonevents auch in OPs suchen
 - Blockieren in Masken ohne KeyLong ermöglichen
+- Grid Attribut "read-only" auslesen
 
 ## [12.12.1] - 10.07.2024
 
