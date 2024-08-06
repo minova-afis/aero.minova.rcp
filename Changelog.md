@@ -14,6 +14,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.13.0] - 06.08.2024
 
 ### Neu
 - Attribut "reload-detail" für onclick events
