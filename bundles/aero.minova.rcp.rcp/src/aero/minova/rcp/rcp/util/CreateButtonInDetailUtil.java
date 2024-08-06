@@ -364,6 +364,20 @@ public class CreateButtonInDetailUtil {
 	}
 
 	private Object findEventForID(String id) {
+		if (findEventForID(id, form) != null) {
+			return findEventForID(id, form);
+		}
+
+		for (Form f : mDetail.getOptionPages()) {
+			if (findEventForID(id, f) != null) {
+				return findEventForID(id, f);
+			}
+		}
+
+		return null;
+	}
+
+	private Object findEventForID(String id, Form form) {
 		if (form.getEvents() != null) {
 			for (Onclick onclick : form.getEvents().getOnclick()) {
 				if (onclick.getRefid().equals(id)) {
