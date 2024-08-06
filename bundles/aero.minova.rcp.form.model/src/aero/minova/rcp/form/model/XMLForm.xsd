@@ -1153,6 +1153,7 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute default="false" name="reload-detail" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:complexType name="value-change">
 		<xs:annotation>

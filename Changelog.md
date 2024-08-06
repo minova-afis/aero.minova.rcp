@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Neu
+- Attribut "reload-detail" für onclick events
+
 ### Bugfixes
 - Buttonevents auch in OPs suchen
 - Blockieren in Masken ohne KeyLong ermöglichen
