@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rcp
 Bundle-SymbolicName: aero.minova.rcp.rcp;singleton:=true
-Bundle-Version: 12.12.1.qualifier
+Bundle-Version: 12.13.0.qualifier
 Export-Package: aero.minova.rcp.rcp.accessor,
  aero.minova.rcp.rcp.fields,
  aero.minova.rcp.rcp.parts,
