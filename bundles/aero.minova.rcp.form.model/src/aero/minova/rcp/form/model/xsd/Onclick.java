@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element name="onfail" type="{}onfail" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="refid" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
+ *       &lt;attribute name="reload-detail" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -66,6 +67,8 @@ public class Onclick {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
     protected String refid;
+    @XmlAttribute(name = "reload-detail")
+    protected java.lang.Boolean reloadDetail;
 
     /**
      * Gets the value of the binderOrProcedureOrInstance property.
@@ -147,6 +150,34 @@ public class Onclick {
      */
     public void setRefid(String value) {
         this.refid = value;
+    }
+
+    /**
+     * Ruft den Wert der reloadDetail-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public boolean isReloadDetail() {
+        if (reloadDetail == null) {
+            return false;
+        } else {
+            return reloadDetail;
+        }
+    }
+
+    /**
+     * Legt den Wert der reloadDetail-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public void setReloadDetail(java.lang.Boolean value) {
+        this.reloadDetail = value;
     }
 
 }

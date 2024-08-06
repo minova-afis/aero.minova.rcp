@@ -51,11 +51,14 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private IConfigRegistry configRegistry;
 	private List<GridLookupContentProvider> contentProviderList;
 	private TranslationService translationService;
+	private boolean gridIsReadOnly;
 
-	public MinovaGridConfiguration(List<Column> columns, List<MField> fields, IDataService dataService, TranslationService translationService) {
+	public MinovaGridConfiguration(List<Column> columns, List<MField> fields, IDataService dataService, TranslationService translationService,
+			boolean gridIsReadOnly) {
 		this.columns = columns;
 		this.fields = fields;
 		this.dataService = dataService;
+		this.gridIsReadOnly = gridIsReadOnly;
 		this.readOnlyColumns = new ArrayList<>();
 		this.contentProviderList = new ArrayList<>();
 		this.translationService = translationService;
@@ -128,29 +131,33 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 			configureSummary(configRegistry, i);
 
+			boolean isReadOnly = column.isReadOnly() || gridIsReadOnly;
+
 			if (column.isLookup()) {
-				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired(),
+				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired(),
 						gridFields.get(column.getName()));
 
 			} else if (column.getType().equals(DataType.BOOLEAN)) {
-				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
+				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
 
 			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTimeType().equals(DateTimeType.DATE)) {
-				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
+				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
 
 			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTimeType().equals(DateTimeType.TIME)) {
-				configureShortTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
+				configureShortTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
 
 			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTimeType().equals(DateTimeType.DATETIME)) {
-				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
+				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
 
 			} else if (column.getType().equals(DataType.DOUBLE) || column.getType().equals(DataType.BIGDECIMAL)) {
-				configureDoubleCell(configRegistry, i++, gridFields.get(column.getName()), ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(),
+				configureDoubleCell(configRegistry, i++, gridFields.get(column.getName()), ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly,
 						column.isRequired());
+
 			} else if (column.getType().equals(DataType.INTEGER)) {
-				configureIntegerCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
+				configureIntegerCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
+
 			} else {
-				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
+				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, isReadOnly, column.isRequired());
 			}
 		}
 	}
