@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Workspace Selector
 Bundle-SymbolicName: aero.minova.rcp.workspace;singleton:=true
-Bundle-Version: 12.13.1.qualifier
+Bundle-Version: 12.13.2.qualifier
 Bundle-Vendor: MINOVA Information Services GmbH
 Automatic-Module-Name: aero.minova.rcp.workspace
 Bundle-RequiredExecutionEnvironment: JavaSE-17
