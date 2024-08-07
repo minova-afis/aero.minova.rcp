@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Bugfixes
+- Min- und Max-Values von Money-Feldern prüfen
+
 ## [12.13.1] - 06.08.2024
 
 ### Bugfixes
