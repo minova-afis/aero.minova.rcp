@@ -48,7 +48,7 @@
                 <version>${tycho.version}</version>
                 <configuration>
                     <argLine>${additionalTestArgLine} -DbuildingWithTycho=true ${ui.test.vmargs}</argLine>
-                    <appArgLine>-nl de -clearPersistedState -consoleLog -user=admin -pw=rqgzxTf71EAx8chvchMi -url=http://publictest.minova.com:17280/cas
+                    <appArgLine>-nl de -clearPersistedState -consoleLog -user=admin -pw=rqgzxTf71EAx8chvchMi -url=https://publictest.minova.com/cas/
                     </appArgLine>
                     <useUIHarness>true</useUIHarness>
                     <useUIThread>false</useUIThread>

@@ -110,7 +110,7 @@ public class DataService implements IDataService {
 
 	private String username = null;// "admin";
 	private String password = null;// "rqgzxTf71EAx8chvchMi";
-	private URI server = null;// "http://publictest.minova.com:17280/cas";
+	private URI server = null;// "https://publictest.minova.com/cas/";
 
 	private URI workspacePath;
 

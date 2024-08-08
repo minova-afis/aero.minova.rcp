@@ -241,7 +241,7 @@ public class LifeCycle {
 
 		String argUser = null;// "admin";
 		String argPW = null;// "rqgzxTf71EAx8chvchMi";
-		String argURL = null;// "http://publictest.minova.com:17280/cas";
+		String argURL = null;// "https://publictest.minova.com/cas/";
 
 		// Auslesen der übergebenen Programm Argumente
 		for (String string : Platform.getApplicationArgs()) {
