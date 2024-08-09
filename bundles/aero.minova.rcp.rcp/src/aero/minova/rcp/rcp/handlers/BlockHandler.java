@@ -50,7 +50,6 @@ public class BlockHandler implements ValueChangeListener {
 	HandledToolItemImpl blockedToolItem;
 	WFCDetailPart detail;
 	MPart mPart;
-	MField keyLong;
 	MField blocked;
 	boolean firstCall = true;
 
@@ -83,13 +82,12 @@ public class BlockHandler implements ValueChangeListener {
 			init(part);
 		}
 
-		return keyLong.getValue() != null;
+		return detail.getDetail().getPrimaryFields().get(0).getValue() != null;
 	}
 
 	private void init(MPart part) {
 		this.mPart = part;
 		this.detail = (WFCDetailPart) part.getObject();
-		this.keyLong = detail.getDetail().getField(Constants.TABLE_KEYLONG);
 		this.blocked = detail.getDetail().getField("Blocked");
 		blocked.addValueChangeListener(this);
 

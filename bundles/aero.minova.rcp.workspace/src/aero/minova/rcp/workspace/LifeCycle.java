@@ -2,6 +2,7 @@ package aero.minova.rcp.workspace;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -39,13 +39,16 @@ import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.translate.lifecycle.Manager;
+import aero.minova.rcp.util.OSUtil;
+import aero.minova.rcp.workspace.dialogs.DefaultProfileWorkspaceDialog;
+import aero.minova.rcp.workspace.dialogs.MinovaWorkspaceDialog;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 import aero.minova.rcp.workspace.dialogs.WorkspaceSetDialog;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
 public class LifeCycle {
 
-	private static final String WFC_APPLICATION = "WFC.Application";
+	private static final String FREE_TABLES_APPLICATION = "FreeTables.Application";
 	public static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 
 	ILog logger = Platform.getLog(this.getClass());
@@ -87,10 +90,10 @@ public class LifeCycle {
 		workbenchContext.set(Constants.SETTINGS_PROPERTIES, settings);
 		defaultConnectionString = settings.getProperty(Constants.SETTINGS_DEFAULT_CONNECTION_STRING);
 
-		ImageDescriptor imageDefault = ImageUtil.getImageDescriptor(WFC_APPLICATION, 16);
-		ImageDescriptor imageDefault2 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 32);
-		ImageDescriptor imageDefault3 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 64);
-		ImageDescriptor imageDefault4 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 256);
+		ImageDescriptor imageDefault = ImageUtil.getImageDescriptor(FREE_TABLES_APPLICATION, 16);
+		ImageDescriptor imageDefault2 = ImageUtil.getImageDescriptor(FREE_TABLES_APPLICATION, 32);
+		ImageDescriptor imageDefault3 = ImageUtil.getImageDescriptor(FREE_TABLES_APPLICATION, 64);
+		ImageDescriptor imageDefault4 = ImageUtil.getImageDescriptor(FREE_TABLES_APPLICATION, 256);
 		Window.setDefaultImages(
 				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
 
@@ -109,12 +112,19 @@ public class LifeCycle {
 
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
-			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null, applicationContext);
+
+			MinovaWorkspaceDialog workspaceDialog = getWorkspaceDialog(null);
 			workspaceDialog.setDefaultConnectionString(defaultConnectionString);
 
-			if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData().isEmpty()) {
+			if (workspaceDialog instanceof DefaultProfileWorkspaceDialog && //
+					!WorkspaceAccessPreferences.getWorkspaceAccessDataByName(workspaceDialog.getProfile()).isEmpty()) {
+				// Wenn Default-Profil passt dieses verwenden
+				workspaceLocation = loginWorkspaceFromPrefs(workspaceLocation, workspaceDialog,
+						WorkspaceAccessPreferences.getWorkspaceAccessDataByName(workspaceDialog.getProfile()).get());
+			} else if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData().isEmpty()) {
 				// Wenn Default-Workspace gesetzt ist diesen nutzen
-				workspaceLocation = loginDefaultWorkspace(workspaceLocation, workspaceDialog);
+				workspaceLocation = loginWorkspaceFromPrefs(workspaceLocation, workspaceDialog,
+						WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData().get());
 			} else {
 				// Ansonsten sofort Login-Dialog öffnen
 				workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
@@ -132,6 +142,28 @@ public class LifeCycle {
 		manager.postContextCreate(workbenchContext);
 	}
 
+	private MinovaWorkspaceDialog getWorkspaceDialog(String profileName) {
+
+		// Wenn es die Datei "DefaultProfile.properties" gibt entsprechenden Dialog öffnen, siehe #1579
+		try {
+			File propertiesFile = new File(OSUtil.isMac() ? "../../../DefaultProfile.properties" : "../DefaultProfile.properties");
+			if (propertiesFile.exists()) {
+				Properties properties = new Properties();
+				try (BufferedInputStream targetStream = new BufferedInputStream(new FileInputStream(propertiesFile))) {
+					properties.load(targetStream);
+				} catch (IOException e) {
+					logger.error(e.getMessage());
+				}
+				return new DefaultProfileWorkspaceDialog(null, applicationContext, properties);
+			}
+		} catch (Exception e) {
+			logger.error("Error finding DefaultProfile.properties file", e);
+		}
+
+		// Ansonsten den "normalen" Dialog
+		return new WorkspaceDialog(null, applicationContext, profileName);
+	}
+
 	/**
 	 * Versuchen über Default-Daten einzuloggen. Bei Fehlschlag wird Login-Dialog geöffnet
 	 *
@@ -139,22 +171,18 @@ public class LifeCycle {
 	 * @param workspaceDialog
 	 * @return
 	 */
-	private URI loginDefaultWorkspace(URI workspaceLocation, WorkspaceDialog workspaceDialog) {
+	private URI loginWorkspaceFromPrefs(URI workspaceLocation, MinovaWorkspaceDialog workspaceDialog, ISecurePreferences sPrefs) {
 		try {
-			Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData();
-			if (savedPrimaryWorkspaceAccessData.isPresent()) {
-				ISecurePreferences sPrefs = savedPrimaryWorkspaceAccessData.get();
-				if (!Platform.getInstanceLocation().isSet()) {
-					Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
+			if (!Platform.getInstanceLocation().isSet()) {
+				Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
 
-					workspaceLocation = parseURI(workspaceLocation);
+				workspaceLocation = parseURI(workspaceLocation);
 
-					if (workspaceLocation == null) {
-						WorkspaceAccessPreferences.resetDefaultWorkspace();
-						workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
-					} else {
-						workspaceLocation = checkDefaultWorkspace(workspaceLocation, sPrefs);
-					}
+				if (workspaceLocation == null) {
+					WorkspaceAccessPreferences.resetDefaultWorkspace();
+					workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+				} else {
+					workspaceLocation = checkWorkspace(workspaceLocation, sPrefs);
 				}
 			}
 		} catch (Exception e) {
@@ -174,7 +202,7 @@ public class LifeCycle {
 	}
 
 	/**
-	 * Überprüfen, ob die Default-Login-Daten gültig sind. Ansonsten Login-Dialog öffnen
+	 * Überprüfen, ob die gewählten Login-Daten gültig sind. Ansonsten Login-Dialog öffnen
 	 * 
 	 * @param workspaceLocation
 	 * @param workspaceDialog
@@ -182,19 +210,20 @@ public class LifeCycle {
 	 * @return
 	 * @throws StorageException
 	 */
-	private URI checkDefaultWorkspace(URI workspaceLocation, ISecurePreferences sPrefs) throws StorageException {
+	private URI checkWorkspace(URI workspaceLocation, ISecurePreferences sPrefs) throws StorageException {
 		String username = sPrefs.get(WorkspaceAccessPreferences.USER, null);
 		String pw = sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null);
 		String url = sPrefs.get(WorkspaceAccessPreferences.URL, null);
 
 		try {
 			WorkspaceHandler workspaceHandler = WorkspaceHandler.newInstance(sPrefs.name(), url);
-			workspaceHandler.checkConnection(username, pw, workspaceLocation.toString(), true);
+			workspaceHandler.checkConnection(username, pw, workspaceLocation.toString(),
+					sPrefs.getBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false));
 			workspaceHandler.open();
 
 			dataService.setCredentials(username, pw, url, workspaceLocation);
 		} catch (WorkspaceException e) {
-			WorkspaceDialog defaultDialog = new WorkspaceDialog(null, applicationContext, sPrefs.name());
+			MinovaWorkspaceDialog defaultDialog = getWorkspaceDialog(sPrefs.name());
 			defaultDialog.setDefaultConnectionString(defaultConnectionString);
 			workspaceLocation = loadWorkspaceConfigManually(defaultDialog, workspaceLocation);
 		}
@@ -212,7 +241,7 @@ public class LifeCycle {
 
 		String argUser = null;// "admin";
 		String argPW = null;// "rqgzxTf71EAx8chvchMi";
-		String argURL = null;// "http://publictest.minova.com:17280/cas";
+		String argURL = null;// "https://publictest.minova.com/cas/";
 
 		// Auslesen der übergebenen Programm Argumente
 		for (String string : Platform.getApplicationArgs()) {
@@ -337,7 +366,7 @@ public class LifeCycle {
 	 * @param workspaceLocation
 	 * @return
 	 */
-	private URI loadWorkspaceConfigManually(WorkspaceDialog workspaceDialog, URI workspaceLocation) {
+	private URI loadWorkspaceConfigManually(MinovaWorkspaceDialog workspaceDialog, URI workspaceLocation) {
 		int returnCode;
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("ReturnCode: " + returnCode);

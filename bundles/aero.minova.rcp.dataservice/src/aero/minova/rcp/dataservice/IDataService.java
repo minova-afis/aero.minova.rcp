@@ -62,8 +62,6 @@ public interface IDataService {
 	 */
 	CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText);
 
-	CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache);
-
 	/**
 	 * Diese Methode liefert alle möglichen Werte für das gegebene Lookup.
 	 *
@@ -109,6 +107,13 @@ public interface IDataService {
 	 * @return
 	 */
 	CompletableFuture<Value> getSQLValue(String tablename, String requestColumn, Value requestValue, String resultColumn, DataType resultType);
+
+	/**
+	 * Fragt die Bezeichnung des verbundenen CAS zurück. Ist kein Label definiert wird die URL zurückgegeben
+	 * 
+	 * @return
+	 */
+	CompletableFuture<String> getCASLabel();
 
 	CompletableFuture<String> getHashedFile(String filename);
 

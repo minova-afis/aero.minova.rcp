@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Get branch name
         id: branch-name
-        uses: tj-actions/branch-names@v8.0.0
+        uses: tj-actions/branch-names@v8.0.1
 
       - uses: actions/checkout@v4
         with:
@@ -31,7 +31,7 @@ jobs:
           cache: 'maven'
 
       - name: Cache SonarQube packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar

@@ -22,7 +22,6 @@ public class Column {
 	boolean required;
 	boolean isLookup;
 	boolean visible;
-	String lookupTable;
 	KeyType keyType;
 	boolean key;
 
@@ -107,14 +106,6 @@ public class Column {
 		this.visible = visible;
 	}
 
-	public String getLookupTable() {
-		return lookupTable;
-	}
-
-	public void setLookupTable(String lookupTable) {
-		this.lookupTable = lookupTable;
-	}
-
 	public KeyType getKeyType() {
 		return keyType;
 	}
@@ -143,7 +134,6 @@ public class Column {
 		result = prime * result + (isLookup ? 1231 : 1237);
 		result = prime * result + ((keyType == null) ? 0 : keyType.hashCode());
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result + ((lookupTable == null) ? 0 : lookupTable.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((getOutputType() == null) ? 0 : getOutputType().hashCode());
 		result = prime * result + (readOnly ? 1231 : 1237);

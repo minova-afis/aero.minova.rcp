@@ -24,6 +24,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -93,6 +94,7 @@ import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
+import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.BrowserAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
@@ -141,6 +143,9 @@ public class WFCDetailPart extends WFCFormPart {
 	private Composite composite;
 
 	private MDetail mDetail = new MDetail();
+
+	@Inject
+	IEventBroker broker;
 
 	@Inject
 	private MPart mPart;
@@ -218,7 +223,13 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// Helpers erst initialisieren, wenn casRequestsUtil erstellt wurde
 		for (IHelper helper : mDetail.getHelpers()) {
-			helper.setControls(mDetail);
+
+			try {
+				helper.setControls(mDetail);
+			} catch (Exception e) {
+				logger.error("Error initializing Helper " + helper.getClass().getCanonicalName(), e);
+				broker.send(Constants.BROKER_SHOWERROR, new ErrorObject("@msg.HelperInitializationError", e));
+			}
 		}
 		// Default Werte aus der Maske in Feldern wieder füllen.
 		// WICHTIG: Zuerst Default Werte setzen und dann die Werte aus der XBS!
@@ -611,6 +622,7 @@ public class WFCDetailPart extends WFCFormPart {
 		for (Field f : grid.getField()) {
 			try {
 				MField mF = ModelToViewModel.convert(f, locale);
+				mF.setParent(mgrid);
 				mFields.add(mF);
 			} catch (NullPointerException e) {
 				showErrorMissingSQLIndex(f, grid.getId() + "." + f.getName(), e);
@@ -752,6 +764,7 @@ public class WFCDetailPart extends WFCFormPart {
 	private void createGrid(Composite composite, MSection mSection, MinovaSection section, IEclipseContext context, Object fieldOrGrid) {
 		SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 		MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
+		sg.setmGrid(mGrid);
 		mGrid.addGridChangeListener(dirtyFlagUtil);
 		GridAccessor gA = new GridAccessor(mGrid);
 		gA.setSectionGrid(sg);

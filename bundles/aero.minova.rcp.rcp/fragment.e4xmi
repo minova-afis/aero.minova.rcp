@@ -419,5 +419,6 @@
     <elements xsi:type="application:Addon" xmi:id="_Lx0fYCEvEeyLzPNotbg_ew" elementId="aero.minova.rcp.rcp.addon.iconrendering" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.addons.IconRendering"/>
     <elements xsi:type="application:Addon" xmi:id="_LiQbIPYfEeyxFrZzmcAvXw" elementId="aero.minova.rcp.rcp.addon.notificationanderroraddon" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.addons.NotificationAndErrorAddon"/>
     <elements xsi:type="application:Addon" xmi:id="_jr1uYPbcEeyxFrZzmcAvXw" elementId="aero.minova.rcp.rcp.addon.windowcloselisteneraddon" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.addons.WindowCloseListenerAddon"/>
+    <elements xsi:type="application:Addon" xmi:id="_RIEmwCMIEe-NeP13ZPgZLw" elementId="aero.minova.rcp.rcp.addon.windowcloselisteneraddon" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.addons.WindowLabelAddon"/>
   </fragments>
 </fragment:ModelFragments>

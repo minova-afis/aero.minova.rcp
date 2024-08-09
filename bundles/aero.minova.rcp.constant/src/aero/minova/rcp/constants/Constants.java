@@ -76,7 +76,12 @@ public class Constants {
 	public static final String BROKER_DELETEENTRY = "aero/minova/rcp/DeleteEntry";
 	public static final String BROKER_NEWENTRY = "aero/minova/rcp/NewFields";
 	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/ClearFields";
+
+	/**
+	 * Lädt das Detail mit der übergebenen Tabelle neu. Wird null übergeben wird das Detail mit den akuellen Keys neu geladen
+	 */
 	public static final String BROKER_RELOADFIELDS = "aero/minova/rcp/ReloadFields";
+
 	public static final String BROKER_CLEARSELECTION = "aero/minova/rcp/ClearSelection";
 	public static final String BROKER_REVERTENTRY = "aero/minova/rcp/RevertEntry";
 	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero/minova/rcp/WFCLoadAllLookUpValues";

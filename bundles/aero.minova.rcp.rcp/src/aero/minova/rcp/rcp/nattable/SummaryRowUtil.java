@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.rcp.nattable;
 
 import java.util.List;
 
@@ -11,7 +11,6 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.summaryrow.ISummaryProvider;
 import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
-import org.eclipse.nebula.widgets.nattable.summaryrow.SummationSummaryProvider;
 
 import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -20,9 +19,9 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import ca.odell.glazedlists.SortedList;
 
-public class NattableSummaryUtil {
+public class SummaryRowUtil {
 
-	private NattableSummaryUtil() {}
+	private SummaryRowUtil() {}
 
 	public static void configureSummary(Form form, NatTable natTable, SortedList<Row> sortedList, MinovaColumnPropertyAccessor columnPropertyAccessor) {
 		List<ColumnWrapper> columns = form.getIndexView().getColumn().stream().map(c -> new ColumnWrapper(c.getAggregate(), c.isTotal())).toList();
@@ -66,7 +65,7 @@ public class NattableSummaryUtil {
 							summaryProvider = new MinSummaryProvider(summaryDataProvider);
 							break;
 						case SUM:
-							summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
+							summaryProvider = new SumSummaryProvider(summaryDataProvider);
 							break;
 						default:
 							break;
@@ -75,7 +74,7 @@ public class NattableSummaryUtil {
 
 					// Summe ("total" in .xml)
 					if (cw.total) {
-						summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
+						summaryProvider = new SumSummaryProvider(summaryDataProvider);
 					}
 
 					if (summaryProvider != null) {
@@ -99,7 +98,32 @@ public class NattableSummaryUtil {
 
 		@Override
 		public Object summarize(int columnIndex) {
-			return this.dataProvider.getRowCount();
+			int rowCount = this.dataProvider.getRowCount();
+			int valueRows = 0;
+			int count = 0;
+
+			// Überprüfen ob Boolean-Spalte -> nur TRUE Werte
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				if (dataValue instanceof Boolean b) {
+					valueRows++;
+					if (Boolean.TRUE.equals(b)) {
+						count++;
+					}
+				}
+			}
+
+			if (valueRows == 0) {
+				// Keine Boolean Spalte -> Anzahl Zeilen mit Wert != null
+				count = 0;
+				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+					Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+					if (dataValue != null && !(dataValue instanceof String s && s.isBlank())) {
+						count++;
+					}
+				}
+			}
+			return count;
 		}
 	}
 
@@ -183,6 +207,33 @@ public class NattableSummaryUtil {
 				return 0;
 			}
 			return max;
+		}
+	}
+
+	static class SumSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public SumSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			double summaryValue = 0;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+
+				if (dataValue instanceof Number n) {
+					summaryValue += n.doubleValue();
+				} else if (dataValue instanceof Boolean b && Boolean.TRUE.equals(b)) {
+					summaryValue++;
+				}
+			}
+
+			return summaryValue;
 		}
 	}
 

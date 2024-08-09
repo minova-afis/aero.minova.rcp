@@ -66,8 +66,8 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
+import aero.minova.rcp.rcp.nattable.SummaryRowUtil;
 import aero.minova.rcp.rcp.util.CustomComparator;
-import aero.minova.rcp.rcp.util.NattableSummaryUtil;
 import aero.minova.rcp.util.OSUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -232,7 +232,7 @@ public class MinovaWizardIndexUtil {
 			}
 		});
 
-		NattableSummaryUtil.configureSummary(form, natTable, bodyLayerStack.getSortedList(), columnPropertyAccessor);
+		SummaryRowUtil.configureSummary(form, natTable, bodyLayerStack.getSortedList(), columnPropertyAccessor);
 
 		natTable.configure();
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());

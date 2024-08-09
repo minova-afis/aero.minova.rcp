@@ -21,6 +21,7 @@ import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.IValueAccessor;
+import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.widgets.LookupComposite;
@@ -54,12 +55,12 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 				setFocussed(false);
 				// Überprüfung ob der eingetragenen Wert in der Liste ist und ebenfalls gültig!
 				field.setValue(field.getValue(), false);
-				((DetailAccessor) field.getDetail().getDetailAccessor()).setSelectedControl(null);
+				((DetailAccessor) ((MDetail) field.getParent()).getDetailAccessor()).setSelectedControl(null);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				((DetailAccessor) field.getDetail().getDetailAccessor()).setSelectedControl(control);
+				((DetailAccessor) ((MDetail) field.getParent()).getDetailAccessor()).setSelectedControl(control);
 				setFocussed(true);
 			}
 		});

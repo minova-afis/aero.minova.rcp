@@ -10,6 +10,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
@@ -77,6 +78,9 @@ public class CreateButtonInDetailUtil {
 
 	@Inject
 	MPart mPart;
+
+	@Inject
+	IEventBroker broker;
 
 	@Inject
 	@Optional
@@ -249,6 +253,10 @@ public class CreateButtonInDetailUtil {
 							// Auch in Methode createParameters() anpassen!!
 							System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
 						}
+
+						if (onclick.isReloadDetail()) {
+							broker.post(Constants.BROKER_RELOADFIELDS, null);
+						}
 					}
 				}
 			}
@@ -364,6 +372,20 @@ public class CreateButtonInDetailUtil {
 	}
 
 	private Object findEventForID(String id) {
+		if (findEventForID(id, form) != null) {
+			return findEventForID(id, form);
+		}
+
+		for (Form f : mDetail.getOptionPages()) {
+			if (findEventForID(id, f) != null) {
+				return findEventForID(id, f);
+			}
+		}
+
+		return null;
+	}
+
+	private Object findEventForID(String id, Form form) {
 		if (form.getEvents() != null) {
 			for (Onclick onclick : form.getEvents().getOnclick()) {
 				if (onclick.getRefid().equals(id)) {

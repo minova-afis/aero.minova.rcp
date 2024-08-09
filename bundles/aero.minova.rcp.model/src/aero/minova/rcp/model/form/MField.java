@@ -38,7 +38,7 @@ public abstract class MField {
 	private List<String> lookupParameters;
 	private final DataType dataType;
 	private DateTimeType dateTimeType;
-	private MDetail mDetail;
+	private MParent mParent;
 	private boolean originalRequired;
 	private boolean required;
 	private boolean originalReadOnly;
@@ -294,12 +294,12 @@ public abstract class MField {
 		valueAccessor.setEditable(!readOnly);
 	}
 
-	public MDetail getDetail() {
-		return mDetail;
+	public MParent getParent() {
+		return mParent;
 	}
 
-	public void setDetail(MDetail detail) {
-		this.mDetail = detail;
+	public void setParent(MParent parent) {
+		this.mParent = parent;
 	}
 
 	public void setOriginalRequired(boolean originalRequired) {
@@ -377,7 +377,7 @@ public abstract class MField {
 		this.visible = visible;
 
 		// Section neu Zeichnen
-		if (mDetail != null && mDetail.getDetailAccessor() != null) {
+		if (mParent instanceof MDetail mDetail && mDetail.getDetailAccessor() != null) {
 			mDetail.getDetailAccessor().redrawSection(mSection);
 		}
 

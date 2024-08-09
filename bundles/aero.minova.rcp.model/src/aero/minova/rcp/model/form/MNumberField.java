@@ -23,6 +23,8 @@ public class MNumberField extends MField {
 			numberValue = getValue().getDoubleValue();
 		} else if (getValue().getIntegerValue() != null) {
 			numberValue = getValue().getIntegerValue();
+		} else if (getValue().getBigDecimalValue() != null) {
+			numberValue = getValue().getBigDecimalValue();
 		}
 
 		String tooltip = null;

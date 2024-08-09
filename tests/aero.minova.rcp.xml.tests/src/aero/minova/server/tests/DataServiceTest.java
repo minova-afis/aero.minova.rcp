@@ -33,7 +33,7 @@ class DataServiceTest {
 	private String username = "admin";
 	private String password = "rqgzxTf71EAx8chvchMi";
 	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
-	private String server = "http://publictest.minova.com:17280/cas";
+	private String server = "https://publictest.minova.com/cas";
 
 	DataService dataService;
 

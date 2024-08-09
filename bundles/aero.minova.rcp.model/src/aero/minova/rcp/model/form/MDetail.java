@@ -16,7 +16,7 @@ import aero.minova.rcp.model.helper.IHelper;
  *
  * @author saak
  */
-public class MDetail {
+public class MDetail extends MParent {
 
 	private TreeMap<String, MField> fields = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	private List<MField> primaryFields = new ArrayList<>();
@@ -46,7 +46,7 @@ public class MDetail {
 			return;
 		}
 		fields.put(field.getName(), field);
-		field.setDetail(this);
+		field.setParent(this);
 
 		if (field.isPrimary()) {
 			primaryFields.add(field);
@@ -136,6 +136,7 @@ public class MDetail {
 	 *            Name des Feldes
 	 * @return Das Feld
 	 */
+	@Override
 	public MField getField(String name) {
 		return fields.get(name);
 	}

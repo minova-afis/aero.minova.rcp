@@ -74,7 +74,7 @@ public class PreferenceWindowModel {
 	}
 
 	private PreferenceTabDescriptor buildAnwendungsTab(TranslationService translationService) {
-		PreferenceTabDescriptor ptd = new PreferenceTabDescriptor("WFC.Application", "applicationTab",
+		PreferenceTabDescriptor ptd = new PreferenceTabDescriptor("FreeTables.Application", "applicationTab",
 				translationService.translate("@Preferences.Application", null), 0.1);
 		PreferenceSectionDescriptor psd = new PreferenceSectionDescriptor("GeneralExecution", translationService.translate(PREFERENCES_GENERAL, null), 0.1);
 		ptd.add(psd);

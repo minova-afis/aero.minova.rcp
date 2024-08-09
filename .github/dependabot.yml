@@ -17,19 +17,16 @@ updates:
     schedule:
       interval: "daily"
     assignees:
-      - "Bauer-David"
       - "janiak-minova"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
     assignees:
-      - "Bauer-David"
       - "janiak-minova"
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "daily"
     assignees:
-      - "Bauer-David"
       - "janiak-minova"

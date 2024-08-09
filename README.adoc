@@ -2,6 +2,7 @@
 
 Der Standard RCP Fatclient von MINOVA
 
+
 Die Dokumentation ist im  link:https://github.com/minova-afis/aero.minova.rcp/wiki[Wiki] dieses Projekts zu finden.
 
 * https://github.com/minova-afis/aero.minova.rcp/blob/master/Changelog.md[Changelog]

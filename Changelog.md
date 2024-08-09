@@ -12,12 +12,60 @@ Mögliche Tags für Änderungen:
 
 Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenotes](https://github.com/minova-afis/aero.minova.rcp/releases) kopiert.
 
-## [Unreleased]
+## Unreleased
 
+
+## [12.13.2] - 07.08.2024
+
+### Bugfixes
+- Min- und Max-Values von Money-Feldern prüfen
+
+## [12.13.1] - 06.08.2024
+
+### Bugfixes
+- Grids ohne Löschen-Button wieder ermöglichen
+
+## [12.13.0] - 06.08.2024
+
+### Neu
+- Attribut "reload-detail" für onclick events
+- Prozeduren in Grid-Lookups ermöglichen
+
+### Bugfixes
+- Buttonevents auch in OPs suchen
+- Blockieren in Masken ohne KeyLong ermöglichen
+- Grid Attribut "read-only" auslesen
+
+## [12.12.1] - 10.07.2024
+
+### Bugfixes
+- Auslesen von DefaultProfile.properties unter Windows korrigieren
+
+## [12.12.0] - 10.07.2024
+
+### Neu
+
+- Einloggen über ein Default-Profil ermöglichen
+
+## [12.11.0] - 05.07.2024
+
+### Neu
+
+- Icon, Splashscreen und Name der Anwendung in "Free Tables" ändern
+- Bezeichnung des konfigurierten CAS laden und im Hauptfenster anzeigen. Ist keine Bezeichnung konfiguriert wird die URL angezeigt
+
+### Änderungen 
+
+- Bei Boolean-Spalten und aggregate="SUM" nur true Werte zählen
+- Bei aggregate="COUNT" nur nicht-null Werte zählen
+
+
+## [12.10.1] - 20.03.2024
 
 ### Neu
 - Knopf zum Zurücksetzten der UI, Übersetzungen ab i18n 12.21.0
-
+- Fehlermeldung anzeigen, wenn beim Initialisieren eines Helpers Fehler auftritt, Übersetzung ab i18n 12.22.0
+- Bei Boolean-Spalten und aggregate="COUNT" nur true-Werte zählen
 
 ### Änderungen 
 - Nattable Version 2.2.1 nutzen

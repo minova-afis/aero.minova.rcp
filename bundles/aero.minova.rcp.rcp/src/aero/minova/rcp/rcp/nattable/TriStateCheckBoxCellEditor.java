@@ -62,7 +62,6 @@ public class TriStateCheckBoxCellEditor extends AbstractCellEditor {
 	protected Control activateCell(Composite parent, Object originalCanonicalValue) {
 		// if this editor was activated by clicking a letter or digit key, do
 		// nothing
-		System.out.println("originalCanonicalValue: " + originalCanonicalValue);
 		if (originalCanonicalValue instanceof Character) {
 			return null;
 		}
@@ -118,7 +117,6 @@ public class TriStateCheckBoxCellEditor extends AbstractCellEditor {
 
 	@Override
 	public Object getCanonicalValue() {
-		System.out.println("getCanonicalValue Return: " + checked);
 		if (checked == null) {
 			return null;
 		} else {
