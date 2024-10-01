@@ -40,6 +40,14 @@ public class LookupContentProvider {
 	 * @return an array list of String that contains propositions for the entry typed by the user
 	 */
 	public List<LookupValue> getContent(final String entry) {
+
+		// Wenn möglich Übersetzten
+		if (tableName != null) {
+			for (LookupValue lv : values) {
+				translateLookup(lv);
+			}
+		}
+
 		MLookupField mField = (MLookupField) lookup.getData(Constants.CONTROL_FIELD);
 		mField.setWrittenText(entry);
 
@@ -51,13 +59,6 @@ public class LookupContentProvider {
 		// Wenn gegeben, weiteren Filter anwenden
 		if (getFilter() != null) {
 			result = result.stream().filter(lv -> getFilter().test(lv)).collect(Collectors.toList());
-		}
-
-		// Wenn möglich Übersetzten
-		if (tableName != null) {
-			for (LookupValue lv : result) {
-				translateLookup(lv);
-			}
 		}
 
 		if (getCustomComparator() == null) {
