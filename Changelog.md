@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Änderung
+- description-name="" in Lookups um keine Beschreibungs-Spalte anzufragen
+
 
 ## [12.13.2] - 07.08.2024
 
