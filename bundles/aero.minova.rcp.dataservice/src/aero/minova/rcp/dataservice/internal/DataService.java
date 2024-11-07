@@ -784,15 +784,20 @@ public class DataService implements IDataService {
 		Table t = TableBuilder.newTable(tableName) //
 				.withColumn(Constants.TABLE_KEYLONG, DataType.INTEGER)//
 				.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
-				.withColumn(lookupDescriptionColumnName, DataType.STRING)//
 				.withColumn(Constants.TABLE_LASTACTION, DataType.INTEGER)//
 				.create();
+
 		Row row = RowBuilder.newRow() //
 				.withValue(keyLong) //
 				.withValue(keyText) //
-				.withValue(null) //
 				.withValue(resolve || !filterLastAction ? null : fv) // Bei Resolve oder FilterLastAction=false nicht nach LastAction filtern #1482
 				.create();
+
+		if (!lookupDescriptionColumnName.isBlank()) {
+			t.addColumn(new Column(lookupDescriptionColumnName, DataType.STRING));
+			row.addValue(null);
+		}
+
 		t.addRow(row);
 		return t;
 	}
@@ -880,7 +885,9 @@ public class DataService implements IDataService {
 						LookupValue lv = new LookupValue(//
 								r.getValue(0).getIntegerValue(), //
 								r.getValue(1).getStringValue(), //
-								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+								r.getValues().size() >= 3 ? //
+										(r.getValue(2) == null ? null : r.getValue(2).getStringValue()) : //
+										null);
 						map.put(lv.keyLong, lv);
 						list.add(lv);
 					}

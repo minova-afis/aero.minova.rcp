@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Änderung
+- description-name="" in Lookups um keine Beschreibungs-Spalte anzufragen
+
 ### Bugfixes
 - Filtern von Lookups mit Übersetzungen korrigieren
 
