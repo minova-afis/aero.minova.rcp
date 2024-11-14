@@ -117,6 +117,8 @@ public class Manager {
 		preferences.putBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, gridTabNavigation);
 		boolean disableFileCache = preferences.getBoolean(ApplicationPreferences.DISABLE_FILE_CACHE, false);
 		preferences.putBoolean(ApplicationPreferences.DISABLE_FILE_CACHE, disableFileCache);
+		boolean showDeleteWarning = preferences.getBoolean(ApplicationPreferences.SHOW_DELETE_WARNING, true);
+		preferences.putBoolean(ApplicationPreferences.SHOW_DELETE_WARNING, showDeleteWarning);
 		String fd = preferences.get(ApplicationPreferences.INDEX_FONT, null);
 		if ("".equals(fd)) {
 			fd = null;
