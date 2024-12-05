@@ -16,6 +16,8 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.export.command.ExportCommand;
+import org.eclipse.nebula.widgets.nattable.extension.poi.PoiExcelExporter;
+import org.eclipse.nebula.widgets.nattable.extension.poi.XSSFExcelExporter;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.swt.SWT;
@@ -62,7 +64,7 @@ public class ExportIndexHandler {
 		final ExportTo target = ExportTo.valueOf(action);
 		Object wfcPart = mpart.getObject();
 		if (wfcPart instanceof WFCIndexPart indexPart) {
-			NatTable natTable = ((WFCIndexPart) wfcPart).getNattable();
+			NatTable natTable = indexPart.getNattable();
 
 			switch (target) {
 			case CLIPBOARD:
@@ -96,7 +98,10 @@ public class ExportIndexHandler {
 				break;
 
 			case EXCEL:
-				natTable.doCommand(new ExportCommand(natTable.getConfigRegistry(), natTable.getShell()));
+				PoiExcelExporter exporter = new XSSFExcelExporter();
+				exporter.setApplyVerticalTextConfiguration(true);
+				exporter.setApplyBackgroundColor(false);
+				natTable.doCommand(new ExportCommand(natTable.getConfigRegistry(), natTable.getShell(), false, false, exporter));
 				break;
 			}
 		}
