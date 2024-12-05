@@ -14,8 +14,12 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+###
+- Nattable Version 2.5.0
+
 ### Änderung
 - description-name="" in Lookups um keine Beschreibungs-Spalte anzufragen
+- Excel Export als .xlsx statt .xls
 
 ### Bugfixes
 - Filtern von Lookups mit Übersetzungen korrigieren

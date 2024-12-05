@@ -16,6 +16,8 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.export.command.ExportCommand;
+import org.eclipse.nebula.widgets.nattable.extension.poi.PoiExcelExporter;
+import org.eclipse.nebula.widgets.nattable.extension.poi.XSSFExcelExporter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
@@ -78,8 +80,8 @@ public class ExportIndexHandler {
 	public void execute(Shell shell, MPart mpart, @Named(COMMAND_ACTION) final String action) {
 		final ExportTo target = ExportTo.valueOf(action);
 		Object wfcPart = mpart.getObject();
-		if (wfcPart instanceof WFCIndexPart) {
-			NatTable natTable = ((WFCIndexPart) wfcPart).getNattable();
+		if (wfcPart instanceof WFCIndexPart indexPart) {
+			NatTable natTable = indexPart.getNattable();
 			StringBuffer csv;
 
 			switch (target) {
@@ -112,7 +114,10 @@ public class ExportIndexHandler {
 				}
 				break;
 			case EXCEL:
-				natTable.doCommand(new ExportCommand(natTable.getConfigRegistry(), natTable.getShell()));
+				PoiExcelExporter exporter = new XSSFExcelExporter();
+				exporter.setApplyVerticalTextConfiguration(true);
+				exporter.setApplyBackgroundColor(false);
+				natTable.doCommand(new ExportCommand(natTable.getConfigRegistry(), natTable.getShell(), false, false, exporter));
 				break;
 			}
 
