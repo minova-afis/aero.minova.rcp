@@ -23,6 +23,8 @@ public class Constants {
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
 
+	public static final String CUSTOMER_PRINT_DATA = "CustomerPrintData";
+
 	public static final String TABLE_KEYTEXT = "KeyText";
 	public static final String TABLE_KEYLONG = "KeyLong";
 	public static final String TABLE_DESCRIPTION = "Description";

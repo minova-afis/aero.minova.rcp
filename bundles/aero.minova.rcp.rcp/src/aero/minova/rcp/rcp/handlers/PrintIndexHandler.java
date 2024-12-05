@@ -23,6 +23,7 @@ import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -42,6 +43,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.internal.FileUtil;
 import aero.minova.rcp.model.Column;
@@ -55,6 +57,7 @@ import aero.minova.rcp.rcp.print.ColumnInfo;
 import aero.minova.rcp.rcp.print.ReportConfiguration;
 import aero.minova.rcp.rcp.print.ReportCreationException;
 import aero.minova.rcp.rcp.print.TableXSLCreator;
+import aero.minova.rcp.rcp.util.CustomerPrintData;
 import aero.minova.rcp.rcp.util.PrintUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.IOUtil;
@@ -79,6 +82,9 @@ public class PrintIndexHandler {
 
 	@Inject
 	private MPerspective mPerspective;
+
+	@Inject
+	private MApplication mApplication;
 
 	ILog logger = Platform.getLog(this.getClass());
 
@@ -514,16 +520,29 @@ public class PrintIndexHandler {
 	 * @param filename
 	 */
 	private void addHeader(StringBuilder xml, String filename) {
+
+		CustomerPrintData printData = (CustomerPrintData) mApplication.getTransientData().get(Constants.CUSTOMER_PRINT_DATA);
+
+		// Können keine Daten gefunden werden auf Minova-Default gehen
+		if (printData == null || printData.getName() == null) {
+			printData = new CustomerPrintData(//
+					"MINOVA Information Services GmbH", //
+					"Leightonstraße 2", //
+					"97074 Würzburg", //
+					"+49 (931) 322 35-0", //
+					"+49 (931) 322 35-55");
+		}
+
 		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 		xml.append("<" + filename + ">\n");
+		xml.append("<Site>\n");
+		xml.append("<Address1><![CDATA[" + printData.getName() + "]]></Address1>\n");
+		xml.append("<Address2><![CDATA[" + printData.getStreet() + "]]></Address2>\n");
+		xml.append("<Address3><![CDATA[" + printData.getCity() + "]]></Address3>\n");
+		xml.append("<Phone><![CDATA[" + printData.getPhone() + "]]></Phone>\n");
+		xml.append("<Fax><![CDATA[" + printData.getFax() + "]]></Fax>\n");
 		xml.append("""
-				<Site>
-				<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>
-				<Address2><![CDATA[Leightonstraße 2]]></Address2>
-				<Address3><![CDATA[97074 Würzburg]]></Address3>
-				<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>
-				<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>
-				<Application>WFC</Application>
+				<Application>FreeTables</Application>
 				<Logo>logo.gif</Logo>
 				</Site>""");
 		xml.append("<PrintDate><![CDATA["

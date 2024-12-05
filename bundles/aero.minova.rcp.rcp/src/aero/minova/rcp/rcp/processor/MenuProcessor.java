@@ -35,6 +35,7 @@ import aero.minova.rcp.form.setup.util.XBSUtil;
 import aero.minova.rcp.form.setup.xbs.Map;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.form.setup.xbs.Preferences.Root;
+import aero.minova.rcp.rcp.util.CustomerPrintData;
 
 public class MenuProcessor {
 
@@ -84,6 +85,15 @@ public class MenuProcessor {
 			if (mapOfNode.containsKey("ApplicationID")) {
 				context.set("aero.minova.rcp.applicationid", mapOfNode.get("ApplicationID"));
 			}
+
+			// Daten für Detail- und Indexdruck
+			mApplication.getTransientData().put(Constants.CUSTOMER_PRINT_DATA, new CustomerPrintData(//
+					mapOfNode.get("Print.CustomerName"), //
+					mapOfNode.get("Print.CustomerStreet"), //
+					mapOfNode.get("Print.CustomerCity"), //
+					mapOfNode.get("Print.CustomerPhone"), //
+					mapOfNode.get("Print.CustomerFax")));
+
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
