@@ -14,7 +14,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
-###
+### Neu
 - Nattable Version 2.5.0
 
 ### Änderung
