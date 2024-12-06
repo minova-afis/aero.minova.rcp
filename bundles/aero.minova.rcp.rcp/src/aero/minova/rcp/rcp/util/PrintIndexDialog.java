@@ -43,7 +43,7 @@ public class PrintIndexDialog extends Dialog {
 
 		text = TextFactory.newText(SWT.BORDER).layoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false)).create(parent);
 
-		text.setText(this.title);
+		text.setText(this.title != null ? title : "");
 		text.selectAll();
 
 		return parent;

@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -159,7 +160,10 @@ public class PrintIndexHandler {
 		String xslString = null;
 		if (o instanceof WFCIndexPart indexPart) {
 
-			final PrintIndexDialog pid = new PrintIndexDialog(shell, translationService, title);
+			// Nach zusätzlichem Titel fragen
+			IEclipseContext context = mPerspective.getContext();
+			String searchConfigName = (String) context.get("ConfigName");
+			final PrintIndexDialog pid = new PrintIndexDialog(shell, translationService, searchConfigName);
 			pid.open();
 			String customTitle = pid.getTitle();
 
@@ -198,7 +202,12 @@ public class PrintIndexHandler {
 			try {
 				TableXSLCreator tableCreator = new TableXSLCreator(this, ePartService);
 				ContextInjectionFactory.inject(tableCreator, mPerspective.getContext());
-				xslString = tableCreator.createXSL(xmlRootTag, title, colConfig, rConfig, pathReports, groupByIndicesReordered);
+
+				String titleInReport = title;
+				if (customTitle != null && !customTitle.isBlank()) {
+					titleInReport += "</fo:block>" + System.lineSeparator() + "<fo:block text-align=\"center\">" + customTitle;
+				}
+				xslString = tableCreator.createXSL(xmlRootTag, titleInReport, colConfig, rConfig, pathReports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				logger.error(e.getMessage(), e);
 			}
