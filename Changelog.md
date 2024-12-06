@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.14.0] - 06.12.2024
+
 ### Neu
 - Index-, Detail- und Statistikdruck mit Kundendaten
 - Indexdruck-Überschrift kann erweitert werden (Übersetzungen ab i18n 12.25.1)
