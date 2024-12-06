@@ -80,7 +80,7 @@
 									<fo:table-cell>
 										<fo:block text-align="start">
 											<!-- <xsl:value-of select="../Site/Application"/> -->
-											WFC
+											Free Tables
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
