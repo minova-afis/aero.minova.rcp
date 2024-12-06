@@ -18,6 +18,22 @@ public class CustomerPrintData {
 		this.email = email;
 	}
 
+	public String getXMLString() {
+		StringBuilder xml = new StringBuilder();
+		xml.append("<Site>\n");
+		xml.append("<Address1><![CDATA[" + name + "]]></Address1>\n");
+		xml.append("<Address2><![CDATA[" + street + "]]></Address2>\n");
+		xml.append("<Address3><![CDATA[" + city + "]]></Address3>\n");
+		xml.append("<Phone><![CDATA[" + phone + "]]></Phone>\n");
+		xml.append("<Fax><![CDATA[" + fax + "]]></Fax>\n");
+		xml.append("<Email><![CDATA[" + email + "]]></Email>\n");
+		xml.append("""
+				<Application>FreeTables</Application>
+				<Logo>logo.gif</Logo>
+				</Site>""");
+		return xml.toString();
+	}
+
 	public String getName() {
 		return name;
 	}

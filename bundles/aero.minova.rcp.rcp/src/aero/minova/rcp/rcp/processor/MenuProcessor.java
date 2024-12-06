@@ -86,14 +86,27 @@ public class MenuProcessor {
 				context.set("aero.minova.rcp.applicationid", mapOfNode.get("ApplicationID"));
 			}
 
-			// Daten für Detail- und Indexdruck
-			mApplication.getTransientData().put(Constants.CUSTOMER_PRINT_DATA, new CustomerPrintData(//
+			// Daten für Detail- und Indexdruck in Kontext
+			CustomerPrintData cpd = new CustomerPrintData(//
 					mapOfNode.get("siteaddress1"), //
 					mapOfNode.get("siteaddress2"), //
 					mapOfNode.get("siteaddress3"), //
 					mapOfNode.get("sitephone"), //
 					mapOfNode.get("sitefax"), //
-					mapOfNode.get("siteemail")));
+					mapOfNode.get("siteemail"));
+
+			// Können keine Daten gefunden werden auf Minova-Default gehen
+			if (cpd.getName() == null) {
+				cpd = new CustomerPrintData(//
+						"MINOVA Information Services GmbH", //
+						"Leightonstraße 2", //
+						"97074 Würzburg", //
+						"+49 (931) 322 35-0", //
+						"+49 (931) 322 35-55", //
+						"service@minova.de");
+			}
+
+			mApplication.getTransientData().put(Constants.CUSTOMER_PRINT_DATA, cpd);
 
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);

@@ -520,33 +520,11 @@ public class PrintIndexHandler {
 	 * @param filename
 	 */
 	private void addHeader(StringBuilder xml, String filename) {
-
 		CustomerPrintData printData = (CustomerPrintData) mApplication.getTransientData().get(Constants.CUSTOMER_PRINT_DATA);
-
-		// Können keine Daten gefunden werden auf Minova-Default gehen
-		if (printData == null || printData.getName() == null) {
-			printData = new CustomerPrintData(//
-					"MINOVA Information Services GmbH", //
-					"Leightonstraße 2", //
-					"97074 Würzburg", //
-					"+49 (931) 322 35-0", //
-					"+49 (931) 322 35-55", //
-					"service@minova.de");
-
-		}
 
 		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 		xml.append("<" + filename + ">\n");
-		xml.append("<Site>\n");
-		xml.append("<Address1><![CDATA[" + printData.getName() + "]]></Address1>\n");
-		xml.append("<Address2><![CDATA[" + printData.getStreet() + "]]></Address2>\n");
-		xml.append("<Address3><![CDATA[" + printData.getCity() + "]]></Address3>\n");
-		xml.append("<Phone><![CDATA[" + printData.getPhone() + "]]></Phone>\n");
-		xml.append("<Fax><![CDATA[" + printData.getFax() + "]]></Fax>\n");
-		xml.append("""
-				<Application>FreeTables</Application>
-				<Logo>logo.gif</Logo>
-				</Site>""");
+		xml.append(printData.getXMLString());
 		xml.append("<PrintDate><![CDATA["
 				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0", timezone), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone)
 				+ "]]></PrintDate>\n"); // TODO: Darauf achten, dass das passt
