@@ -41,6 +41,7 @@ import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.xml.sax.SAXException;
 
 import aero.minova.rcp.constants.Constants;
@@ -58,6 +59,7 @@ import aero.minova.rcp.rcp.print.ReportConfiguration;
 import aero.minova.rcp.rcp.print.ReportCreationException;
 import aero.minova.rcp.rcp.print.TableXSLCreator;
 import aero.minova.rcp.rcp.util.CustomerPrintData;
+import aero.minova.rcp.rcp.util.PrintIndexDialog;
 import aero.minova.rcp.rcp.util.PrintUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.IOUtil;
@@ -144,7 +146,8 @@ public class PrintIndexHandler {
 	}
 
 	@Execute
-	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window) {
+	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, @Named(IServiceConstants.ACTIVE_SHELL) final Shell shell, MPart mpart,
+			MWindow window) {
 
 		String xmlRootTag = null;
 		String title = null;
@@ -155,6 +158,11 @@ public class PrintIndexHandler {
 		Path pathReports = dataService.getStoragePath().resolve("pdf/");
 		String xslString = null;
 		if (o instanceof WFCIndexPart indexPart) {
+
+			final PrintIndexDialog pid = new PrintIndexDialog(shell, translationService, title);
+			pid.open();
+			String customTitle = pid.getTitle();
+
 			Table data = indexPart.getData();
 			xmlRootTag = data.getName();
 			SortedList<Row> sortedDataList = indexPart.getSortedList();
