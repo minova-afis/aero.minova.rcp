@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Index-, Detail- und Statistikdruck mit Kundendaten
+- Indexdruck-Überschrift kann erweitert werden (Übersetzungen ab i18n 12.25.1)
 - Nattable Version 2.5.0
 
 ### Änderung
