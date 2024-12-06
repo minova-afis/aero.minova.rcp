@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -41,6 +42,7 @@ import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.xml.sax.SAXException;
 
 import aero.minova.rcp.constants.Constants;
@@ -58,6 +60,7 @@ import aero.minova.rcp.rcp.print.ReportConfiguration;
 import aero.minova.rcp.rcp.print.ReportCreationException;
 import aero.minova.rcp.rcp.print.TableXSLCreator;
 import aero.minova.rcp.rcp.util.CustomerPrintData;
+import aero.minova.rcp.rcp.util.PrintIndexDialog;
 import aero.minova.rcp.rcp.util.PrintUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.IOUtil;
@@ -144,7 +147,8 @@ public class PrintIndexHandler {
 	}
 
 	@Execute
-	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window) {
+	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, @Named(IServiceConstants.ACTIVE_SHELL) final Shell shell, MPart mpart,
+			MWindow window) {
 
 		String xmlRootTag = null;
 		String title = null;
@@ -155,6 +159,14 @@ public class PrintIndexHandler {
 		Path pathReports = dataService.getStoragePath().resolve("pdf/");
 		String xslString = null;
 		if (o instanceof WFCIndexPart indexPart) {
+
+			// Nach zusätzlichem Titel fragen
+			IEclipseContext context = mPerspective.getContext();
+			String searchConfigName = (String) context.get("ConfigName");
+			final PrintIndexDialog pid = new PrintIndexDialog(shell, translationService, searchConfigName);
+			pid.open();
+			String customTitle = pid.getTitle();
+
 			Table data = indexPart.getData();
 			xmlRootTag = data.getName();
 			SortedList<Row> sortedDataList = indexPart.getSortedList();
@@ -190,7 +202,12 @@ public class PrintIndexHandler {
 			try {
 				TableXSLCreator tableCreator = new TableXSLCreator(this, ePartService);
 				ContextInjectionFactory.inject(tableCreator, mPerspective.getContext());
-				xslString = tableCreator.createXSL(xmlRootTag, title, colConfig, rConfig, pathReports, groupByIndicesReordered);
+
+				String titleInReport = title;
+				if (customTitle != null && !customTitle.isBlank()) {
+					titleInReport += "</fo:block>" + System.lineSeparator() + "<fo:block text-align=\"center\">" + customTitle;
+				}
+				xslString = tableCreator.createXSL(xmlRootTag, titleInReport, colConfig, rConfig, pathReports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				logger.error(e.getMessage(), e);
 			}
