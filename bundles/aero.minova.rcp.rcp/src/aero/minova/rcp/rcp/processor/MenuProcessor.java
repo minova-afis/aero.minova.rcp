@@ -88,11 +88,12 @@ public class MenuProcessor {
 
 			// Daten für Detail- und Indexdruck
 			mApplication.getTransientData().put(Constants.CUSTOMER_PRINT_DATA, new CustomerPrintData(//
-					mapOfNode.get("Print.CustomerName"), //
-					mapOfNode.get("Print.CustomerStreet"), //
-					mapOfNode.get("Print.CustomerCity"), //
-					mapOfNode.get("Print.CustomerPhone"), //
-					mapOfNode.get("Print.CustomerFax")));
+					mapOfNode.get("siteaddress1"), //
+					mapOfNode.get("siteaddress2"), //
+					mapOfNode.get("siteaddress3"), //
+					mapOfNode.get("sitephone"), //
+					mapOfNode.get("sitefax"), //
+					mapOfNode.get("siteemail")));
 
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);

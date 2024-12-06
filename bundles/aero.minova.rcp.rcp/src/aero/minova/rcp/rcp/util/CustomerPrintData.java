@@ -7,13 +7,15 @@ public class CustomerPrintData {
 	private String city;
 	private String phone;
 	private String fax;
+	private String email;
 
-	public CustomerPrintData(String name, String street, String city, String phone, String fax) {
+	public CustomerPrintData(String name, String street, String city, String phone, String fax, String email) {
 		this.name = name;
 		this.street = street;
 		this.city = city;
 		this.phone = phone;
 		this.fax = fax;
+		this.email = email;
 	}
 
 	public String getName() {
@@ -54,6 +56,14 @@ public class CustomerPrintData {
 
 	public void setFax(String fax) {
 		this.fax = fax;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }

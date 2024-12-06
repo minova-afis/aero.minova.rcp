@@ -530,7 +530,9 @@ public class PrintIndexHandler {
 					"Leightonstraße 2", //
 					"97074 Würzburg", //
 					"+49 (931) 322 35-0", //
-					"+49 (931) 322 35-55");
+					"+49 (931) 322 35-55", //
+					"service@minova.de");
+
 		}
 
 		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
@@ -547,7 +549,7 @@ public class PrintIndexHandler {
 				</Site>""");
 		xml.append("<PrintDate><![CDATA["
 				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0", timezone), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone)
-				+ "]]></PrintDate>\n");
+				+ "]]></PrintDate>\n"); // TODO: Darauf achten, dass das passt
 	}
 
 }
