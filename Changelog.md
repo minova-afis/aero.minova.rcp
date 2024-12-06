@@ -15,6 +15,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## Unreleased
 
 ### Neu
+- Index-, Detail- und Statistikdruck mit Kundendaten
 - Nattable Version 2.5.0
 
 ### Änderung
