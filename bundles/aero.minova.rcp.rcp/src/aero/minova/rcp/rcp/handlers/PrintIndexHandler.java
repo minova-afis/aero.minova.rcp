@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -34,6 +35,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
+import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
@@ -171,7 +173,7 @@ public class PrintIndexHandler {
 			xmlRootTag = data.getName();
 			SortedList<Row> sortedDataList = indexPart.getSortedList();
 			ColumnReorderLayer columnReorderLayer = indexPart.getBodyLayerStack().getColumnReorderLayer();
-			columnReorderLayer.getColumnIndexOrder();
+			ColumnHideShowLayer columnHideShowLayer = indexPart.getBodyLayerStack().getColumnHideShowLayer();
 
 			// Gruppierung
 			@SuppressWarnings("unchecked")
@@ -212,7 +214,8 @@ public class PrintIndexHandler {
 				logger.error(e.getMessage(), e);
 			}
 
-			String xmlString = createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xmlRootTag, title);
+			String xmlString = createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(),
+					columnHideShowLayer.getHiddenColumnIndexes(), xmlRootTag, title);
 
 			saveAndShowPDF(xmlRootTag, title, xslString, xmlString);
 		}
@@ -335,7 +338,7 @@ public class PrintIndexHandler {
 	 * @param title
 	 */
 	private String createXML(WFCIndexPart indexPart, TreeList<Object> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
-			List<Integer> columnReorderList, String fileName, String title) {
+			List<Integer> columnReorderList, Collection<Integer> hiddenColumns, String fileName, String title) {
 
 		StringBuilder xml = new StringBuilder();
 		// Viewport layer umgehen, damit in addSumRow() auf alle Zeilen zugegriffen werden kann
@@ -347,9 +350,9 @@ public class PrintIndexHandler {
 		xml.append("<Group>\n" + "<Text><![CDATA[" + translationService.translate("@Total", null) + "]]></Text>\n");
 
 		if (groupByIndices.isEmpty()) { // Keine Gruppierung
-			addRows(xml, treeList, colConfig, columnReorderList);
+			addRows(xml, treeList, colConfig, columnReorderList, hiddenColumns);
 		} else {
-			addGroupByRows(indexPart, treeList, groupByIndices, colConfig, columnReorderList, xml, layer);
+			addGroupByRows(indexPart, treeList, groupByIndices, colConfig, columnReorderList, hiddenColumns, xml, layer);
 		}
 		addFinalSummary(xml, indexPart, colConfig);
 		xml.append("</Group>\n");
@@ -362,7 +365,7 @@ public class PrintIndexHandler {
 
 	@SuppressWarnings("unchecked")
 	private void addGroupByRows(WFCIndexPart indexPart, TreeList<Object> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
-			List<Integer> columnReorderList, StringBuilder xml, ILayer layer) {
+			List<Integer> columnReorderList, Collection<Integer> hiddenColumns, StringBuilder xml, ILayer layer) {
 		int level = 0; // "Level" der Gruppierung (1: erste Gruppierung, 2: zweite Gruppierung, ...)
 		int newLevel = 0;
 		int rowIndex = 0;
@@ -383,7 +386,7 @@ public class PrintIndexHandler {
 				// Tabelle wird nur für "tiefste" Gruppe gedruckt
 				if (gbo.getDescriptor().containsKey(groupByIndices.get(groupByIndices.size() - 1))) {
 					addRows(xml, ((GroupByDataLayer<Object>) indexPart.getBodyLayerStack().getBodyDataLayer()).getItemsInGroup(gbo), colConfig,
-							columnReorderList);
+							columnReorderList, hiddenColumns);
 				}
 
 				// Zusammenfassung als String erstellen und für später speichern
@@ -425,14 +428,12 @@ public class PrintIndexHandler {
 		xml.append("<GroupText><![CDATA[" + tableTitle.substring(0, tableTitle.length() - 2) + "]]></GroupText>\n");
 	}
 
-	private void addRows(StringBuilder xml, List<Object> list, List<ColumnInfo> colConfig, List<Integer> columnReorderList) {
+	private void addRows(StringBuilder xml, List<Object> list, List<ColumnInfo> colConfig, List<Integer> columnReorderList, Collection<Integer> hiddenColumns) {
 		xml.append("<Rows>\n");
 		for (Object o : list) {
 			if (o instanceof Row r) {
-
-				int colIndex = 0;
 				xml.append("<Row>\n");
-				addRowString(xml, colConfig, columnReorderList, r, colIndex);
+				addRowString(xml, colConfig, columnReorderList, hiddenColumns, r);
 				xml.append("</Row>\n");
 			}
 		}
@@ -440,8 +441,14 @@ public class PrintIndexHandler {
 
 	}
 
-	private void addRowString(StringBuilder xml, List<ColumnInfo> colConfig, List<Integer> columnReorderList, Row r, int colIndex) {
+	private void addRowString(StringBuilder xml, List<ColumnInfo> colConfig, List<Integer> columnReorderList, Collection<Integer> hiddenColumns, Row r) {
+		int colIndex = 0;
 		for (final Integer d : columnReorderList) {
+			if (hiddenColumns.contains(d)) {
+				colIndex++;
+				continue;
+			}
+			
 			Column c = colConfig.get(colIndex).column;
 			xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">");
 			if (r.getValue(d) != null) {
