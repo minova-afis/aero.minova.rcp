@@ -39,6 +39,5 @@ Require-Bundle: org.eclipse.osgi,
  org.junit.jupiter.api,
  org.eclipse.jdt.junit5.runtime,
  org.eclipse.ui.forms,
- jakarta.xml.bind,
- org.hamcrest;bundle-version="3.0.0"
+ jakarta.xml.bind
 Bundle-ActivationPolicy: lazy
