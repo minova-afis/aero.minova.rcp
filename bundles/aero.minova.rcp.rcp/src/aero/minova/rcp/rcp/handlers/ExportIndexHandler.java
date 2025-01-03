@@ -4,6 +4,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,6 +20,7 @@ import org.eclipse.nebula.widgets.nattable.export.command.ExportCommand;
 import org.eclipse.nebula.widgets.nattable.extension.poi.PoiExcelExporter;
 import org.eclipse.nebula.widgets.nattable.extension.poi.XSSFExcelExporter;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
+import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
@@ -111,18 +113,20 @@ public class ExportIndexHandler {
 
 		// Spaltennamen raussuchen
 		ColumnReorderLayer columnReorderLayer = indexPart.getBodyLayerStack().getColumnReorderLayer();
+		ColumnHideShowLayer columnHideShowLayer = indexPart.getBodyLayerStack().getColumnHideShowLayer();
 		List<String> columnHeaderList = new ArrayList<>();
 		for (int i = 0; i < columnReorderLayer.getColumnCount(); i++) {
 			columnHeaderList.add(((DefaultColumnHeaderDataProvider) indexPart.getColumnHeaderDataLayer().getDataProvider()).getColumnHeaderLabel(i));
 		}
 
-		return createCSVString(indexPart.getSortedList(), columnHeaderList, columnReorderLayer.getColumnIndexOrder());
+		return createCSVString(indexPart.getSortedList(), columnHeaderList, columnReorderLayer.getColumnIndexOrder(),
+				columnHideShowLayer.getHiddenColumnIndexes());
 	}
 
 	/**
 	 * Speichert den Zeilen-Inhalt als CSV
 	 */
-	protected String createCSVString(SortedList<Row> rows, List<String> cHaederList, List<Integer> columnReorderList) {
+	protected String createCSVString(SortedList<Row> rows, List<String> cHaederList, List<Integer> columnReorderList, Collection<Integer> hiddenColumns) {
 		StringBuilder csv = new StringBuilder();
 
 		String brackets = "\"";
@@ -131,22 +135,17 @@ public class ExportIndexHandler {
 		int colIndex = 0;
 
 		// Header einfügen
-		for (Integer d : columnReorderList) {
-			if (colIndex++ > 0) {
-				csv.append(separator);
-			}
-
-			csv.append(brackets);
-			csv.append(cHaederList.get(d));
-			csv.append(brackets);
-		}
-		csv.append("\r\n");
+		getHeaderForCSV(cHaederList, columnReorderList, hiddenColumns, csv, brackets, separator, colIndex);
 
 		// Werte einfügen
 		for (Row r : rows) {
 			colIndex = 0;
 
 			for (Integer d : columnReorderList) {
+				if (hiddenColumns.contains(d)) {
+					continue;
+				}
+
 				if (colIndex++ > 0) {
 					csv.append(separator);
 				}
@@ -161,6 +160,24 @@ public class ExportIndexHandler {
 		}
 
 		return csv.toString();
+	}
+
+	private void getHeaderForCSV(List<String> cHaederList, List<Integer> columnReorderList, Collection<Integer> hiddenColumns, StringBuilder csv,
+			String brackets, String separator, int colIndex) {
+		for (Integer d : columnReorderList) {
+			if (hiddenColumns.contains(d)) {
+				continue;
+			}
+
+			if (colIndex++ > 0) {
+				csv.append(separator);
+			}
+
+			csv.append(brackets);
+			csv.append(cHaederList.get(d));
+			csv.append(brackets);
+		}
+		csv.append("\r\n");
 	}
 
 	/**
