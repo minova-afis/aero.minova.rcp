@@ -28,6 +28,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 - Filtern von Lookups mit Übersetzungen korrigieren
 - Spaltennamen beim Export als CSV korrigieren
+- Ausgeblendete Spalten nicht Drucken oder Exportieren
 
 
 ## [12.13.2] - 07.08.2024
