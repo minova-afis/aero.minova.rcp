@@ -26,6 +26,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Excel Export als .xlsx statt .xls
 
 ### Bugfixes
+- Tests laufen auf Github wieder durch
 - Filtern von Lookups mit Übersetzungen korrigieren
 - Spaltennamen beim Export als CSV korrigieren
 
