@@ -764,10 +764,9 @@ public class DataService implements IDataService {
 				if (ta != null) {
 					for (Row r : ta.getRows()) {
 						LookupValue lv = new LookupValue(//
-								r.getValue(0).getIntegerValue(), //
-								r.getValue(1).getStringValue(), //
-								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-
+								ta.getValue(Constants.TABLE_KEYLONG, r).getIntegerValue(), //
+								ta.getValue(Constants.TABLE_KEYTEXT, r).getStringValue(), //
+								ta.getValue(lookupDescriptionColumnName, r) == null ? null : ta.getValue(lookupDescriptionColumnName, r).getStringValue());
 						map.put(lv.keyLong, lv);
 						list.add(lv);
 					}
@@ -883,11 +882,9 @@ public class DataService implements IDataService {
 				if (ta != null) {
 					for (Row r : ta.getRows()) {
 						LookupValue lv = new LookupValue(//
-								r.getValue(0).getIntegerValue(), //
-								r.getValue(1).getStringValue(), //
-								r.getValues().size() >= 3 ? //
-										(r.getValue(2) == null ? null : r.getValue(2).getStringValue()) : //
-										null);
+								ta.getValue(Constants.TABLE_KEYLONG, r).getIntegerValue(), //
+								ta.getValue(Constants.TABLE_KEYTEXT, r).getStringValue(), //
+								ta.getValue(Constants.TABLE_DESCRIPTION, r) == null ? null : ta.getValue(Constants.TABLE_DESCRIPTION, r).getStringValue());
 						map.put(lv.keyLong, lv);
 						list.add(lv);
 					}

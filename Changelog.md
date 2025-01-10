@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Bugfixes
+- Beschreibung von Lookups wieder anzeigen
+
 ## [12.14.0] - 06.12.2024
 
 ### Neu
