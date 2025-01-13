@@ -217,10 +217,17 @@ public class PrintIndexHandler {
 				logger.error(e.getMessage(), e);
 			}
 
-			String xmlString = createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(),
-					columnHideShowLayer.getHiddenColumnIndexes(), xmlRootTag, title);
+			try {
+				String xmlString = createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(),
+						columnHideShowLayer.getHiddenColumnIndexes(), xmlRootTag, title);
 
-			saveAndShowPDF(xmlRootTag, title, xslString, xmlString);
+				saveAndShowPDF(xmlRootTag, title, xslString, xmlString);
+			} catch (Exception e) {
+				e.printStackTrace();
+				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+						translationService.translate("@msg.ErrorCreatingXML", null), e);
+			}
+
 		}
 	}
 
