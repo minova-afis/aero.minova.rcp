@@ -223,7 +223,6 @@ public class PrintIndexHandler {
 
 				saveAndShowPDF(xmlRootTag, title, xslString, xmlString);
 			} catch (Exception e) {
-				e.printStackTrace();
 				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
 						translationService.translate("@msg.ErrorCreatingXML", null), e);
 			}
@@ -264,7 +263,6 @@ public class PrintIndexHandler {
 				PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(mPerspective, eModelService, ePartService));
 			}
 		} catch (IOException | SAXException | TransformerException e) {
-			e.printStackTrace();
 			ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
 					translationService.translate("@msg.ErrorShowingFile", null), e);
 		}
