@@ -16,6 +16,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Bugfixes
 - Beschreibung von Lookups wieder anzeigen
+- Nur drucken, wenn in Titel-Dialog auf OK geklickt wird
+
 
 ## [12.14.0] - 06.12.2024
 

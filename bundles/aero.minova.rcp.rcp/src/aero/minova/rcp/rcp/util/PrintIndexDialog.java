@@ -57,6 +57,7 @@ public class PrintIndexDialog extends Dialog {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				PrintIndexDialog.this.title = null;
+				setReturnCode(CANCEL);
 				close();
 			}
 		});
@@ -67,6 +68,7 @@ public class PrintIndexDialog extends Dialog {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				PrintIndexDialog.this.title = text.getText();
+				setReturnCode(OK);
 				close();
 			}
 		});

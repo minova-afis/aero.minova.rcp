@@ -32,6 +32,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.jface.window.Window;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
@@ -166,7 +167,9 @@ public class PrintIndexHandler {
 			IEclipseContext context = mPerspective.getContext();
 			String searchConfigName = (String) context.get("ConfigName");
 			final PrintIndexDialog pid = new PrintIndexDialog(shell, translationService, searchConfigName);
-			pid.open();
+			if (pid.open() == Window.CANCEL) {
+				return;
+			}
 			String customTitle = pid.getTitle();
 
 			Table data = indexPart.getData();
@@ -448,7 +451,7 @@ public class PrintIndexHandler {
 				colIndex++;
 				continue;
 			}
-			
+
 			Column c = colConfig.get(colIndex).column;
 			xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">");
 			if (r.getValue(d) != null) {
