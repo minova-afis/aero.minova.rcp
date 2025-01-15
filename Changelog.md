@@ -14,11 +14,15 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Änderung
+- Index-Aggregat Funktionen für Datum-/Zeitfelder unterstützen
+
+
 ### Bugfixes
 - Beschreibung von Lookups wieder anzeigen
 - Nur drucken, wenn in Titel-Dialog auf OK geklickt wird
 - Fehler beim Erstellen der XML für Indexdruck in UI anzeigen, Übersetzungen ab i18n 12.26.0
-
+- Fehler beim Indexdruck beheben
 
 ## [12.14.0] - 06.12.2024
 
