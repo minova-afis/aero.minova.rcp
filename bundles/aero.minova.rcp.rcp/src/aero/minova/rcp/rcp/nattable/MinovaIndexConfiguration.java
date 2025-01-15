@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
@@ -90,11 +91,20 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 					break;
 
 				case MAX:
-					summaryProvider = this::getMax;
+					if (column.getType().equals(DataType.INSTANT)) {
+						summaryProvider = this::getDateMax;
+					} else {
+						summaryProvider = this::getMax;
+					}
+
 					break;
 
 				case MIN:
-					summaryProvider = this::getMin;
+					if (column.getType().equals(DataType.INSTANT)) {
+						summaryProvider = this::getDateMin;
+					} else {
+						summaryProvider = this::getMin;
+					}
 					break;
 
 				case SUM:
@@ -135,6 +145,17 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 		return min;
 	}
 
+	private Object getDateMin(int columnIndex, List<Row> children) {
+		Instant min = Instant.MAX;
+		for (Row r : children) {
+			if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getInstantValue() != null
+					&& r.getValue(columnIndex).getInstantValue().isBefore(min)) {
+				min = r.getValue(columnIndex).getInstantValue();
+			}
+		}
+		return min;
+	}
+
 	private Object getMax(int columnIndex, List<Row> children) {
 		double max = Double.MIN_VALUE;
 		for (Row r : children) {
@@ -145,6 +166,17 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getBigDecimalValue() != null
 					&& r.getValue(columnIndex).getBigDecimalValue() > max) {
 				max = r.getValue(columnIndex).getBigDecimalValue();
+			}
+		}
+		return max;
+	}
+
+	private Object getDateMax(int columnIndex, List<Row> children) {
+		Instant max = Instant.MIN;
+		for (Row r : children) {
+			if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getInstantValue() != null
+					&& r.getValue(columnIndex).getInstantValue().isAfter(max)) {
+				max = r.getValue(columnIndex).getInstantValue();
 			}
 		}
 		return max;

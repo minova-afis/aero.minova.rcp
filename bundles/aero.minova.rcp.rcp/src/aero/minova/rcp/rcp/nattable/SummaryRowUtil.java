@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.nattable;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -168,6 +169,7 @@ public class SummaryRowUtil {
 		public Object summarize(int columnIndex) {
 			int rowCount = this.dataProvider.getRowCount();
 			double min = Double.MAX_VALUE;
+			Instant minInstant = Instant.MAX;
 
 			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
@@ -175,11 +177,18 @@ public class SummaryRowUtil {
 				if (dataValue instanceof Number n && n.doubleValue() < min) {
 					min = n.doubleValue();
 				}
+				if (dataValue instanceof Instant i && i.isBefore(minInstant)) {
+					minInstant = i;
+				}
 			}
-			if (min == Double.MAX_VALUE) {
-				return 0;
+
+			if (minInstant.equals(Instant.MAX)) {
+				if (min == Double.MAX_VALUE) {
+					return 0;
+				}
+				return min;
 			}
-			return min;
+			return minInstant;
 		}
 	}
 
@@ -196,17 +205,26 @@ public class SummaryRowUtil {
 			int rowCount = this.dataProvider.getRowCount();
 			double max = Double.MIN_VALUE;
 
+			Instant maxInstant = Instant.MIN;
+
 			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
 				// this check is necessary because of the GroupByObject
 				if (dataValue instanceof Number n && n.doubleValue() > max) {
 					max = n.doubleValue();
 				}
+				if (dataValue instanceof Instant i && i.isAfter(maxInstant)) {
+					maxInstant = i;
+				}
 			}
-			if (max == Double.MIN_VALUE) {
-				return 0;
+
+			if (maxInstant.equals(Instant.MIN)) {
+				if (max == Double.MIN_VALUE) {
+					return 0;
+				}
+				return max;
 			}
-			return max;
+			return maxInstant;
 		}
 	}
 
