@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Fop 1.1 Plugin
 Bundle-SymbolicName: aero.minova.libs.fop;singleton:=true
-Bundle-Version: 12.14.0.qualifier
+Bundle-Version: 12.14.1.qualifier
 Automatic-Module-Name: aero.minova.libs.fop
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ClassPath: lib/avalon-framework-4.2.0.jar,

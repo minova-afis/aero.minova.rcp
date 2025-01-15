@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Css
 Bundle-SymbolicName: aero.minova.rcp.css;singleton:=true
-Bundle-Version: 12.14.0.qualifier
+Bundle-Version: 12.14.1.qualifier
 Automatic-Module-Name: aero.minova.rcp.css
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.e4.ui.css.swt.theme,
