@@ -424,7 +424,8 @@ public class PrintIndexHandler {
 				Object colVal = gbo.getDescriptor().get(i);
 				colValString = colVal.toString();
 				if (colVal instanceof Instant instant) {
-					colValString = DateTimeUtil.getDateTimeString(instant, CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone);
+					colValString = formatInstant(instant, CustomLocale.getLocale(), colConfig.get(columnReorderList.indexOf(i)).column.getDateTimeType(),
+							dateUtilPref, timeUtilPref, timezone);
 				}
 				tableTitle.append(colName + ": " + colValString + ", ");
 			}
@@ -559,9 +560,8 @@ public class PrintIndexHandler {
 		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 		xml.append("<" + filename + ">\n");
 		xml.append(printData.getXMLString());
-		xml.append("<PrintDate><![CDATA["
-				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0", timezone), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone)
-				+ "]]></PrintDate>\n"); // TODO: Darauf achten, dass das passt
+		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(Instant.now(), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone)
+				+ "]]></PrintDate>\n");
 	}
 
 	private String formatInstant(Instant i, Locale locale, DateTimeType dateTimeType, String datePattern, String timePattern, String timezone) {
