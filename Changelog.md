@@ -14,9 +14,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.14.1] - 15.01.2025
+
 ### Änderung
 - Index-Aggregat Funktionen für Datum-/Zeitfelder unterstützen
-
 
 ### Bugfixes
 - Beschreibung von Lookups wieder anzeigen
