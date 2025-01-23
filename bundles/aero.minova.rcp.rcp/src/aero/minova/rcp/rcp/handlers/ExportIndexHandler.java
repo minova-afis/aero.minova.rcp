@@ -55,6 +55,14 @@ public class ExportIndexHandler {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	String timezone;
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.INDEX_CSV_SEPARATOR)
+	String separatorSetting;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.INDEX_CSV_BRACKETS)
+	String bracketsSetting;
+
 	public enum ExportTo {
 		CLIPBOARD, FILE, EXCEL
 	}
@@ -70,7 +78,7 @@ public class ExportIndexHandler {
 
 			switch (target) {
 			case CLIPBOARD:
-				String csv = getNattableAsCSVString(indexPart);
+				String csv = getNattableAsCSVString(indexPart, true);
 				Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clip.setContents(new StringSelection(csv), null);
 				broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.ExportIntoClipboardSuccess");
@@ -86,7 +94,7 @@ public class ExportIndexHandler {
 					if (!fileName.endsWith(".csv")) {
 						fileName = fileName + ".csv";
 					}
-					csv = getNattableAsCSVString(indexPart);
+					csv = getNattableAsCSVString(indexPart, false);
 					// Datei speichern mit dem gegebenen Inhalt
 					try {
 						IOUtil.saveLoud(csv, fileName, "UTF-8");
@@ -109,7 +117,7 @@ public class ExportIndexHandler {
 		}
 	}
 
-	private final String getNattableAsCSVString(WFCIndexPart indexPart) {
+	private final String getNattableAsCSVString(WFCIndexPart indexPart, boolean forClipboard) {
 
 		// Spaltennamen raussuchen
 		ColumnReorderLayer columnReorderLayer = indexPart.getBodyLayerStack().getColumnReorderLayer();
@@ -120,17 +128,24 @@ public class ExportIndexHandler {
 		}
 
 		return createCSVString(indexPart.getSortedList(), columnHeaderList, columnReorderLayer.getColumnIndexOrder(),
-				columnHideShowLayer.getHiddenColumnIndexes());
+				columnHideShowLayer.getHiddenColumnIndexes(), forClipboard);
 	}
 
 	/**
 	 * Speichert den Zeilen-Inhalt als CSV
 	 */
-	protected String createCSVString(SortedList<Row> rows, List<String> cHaederList, List<Integer> columnReorderList, Collection<Integer> hiddenColumns) {
+	protected String createCSVString(SortedList<Row> rows, List<String> cHaederList, List<Integer> columnReorderList, Collection<Integer> hiddenColumns,
+			boolean forClipboard) {
 		StringBuilder csv = new StringBuilder();
 
-		String brackets = "\"";
-		String separator = ",";
+		String brackets = bracketsSetting != null ? bracketsSetting : "\"";
+		String separator = separatorSetting != null ? separatorSetting : ",";
+
+		// In die Zwischenablage immer diese Einstellungen nutzen
+		if (forClipboard) {
+			brackets = "";
+			separator = "\t";
+		}
 
 		int colIndex = 0;
 
