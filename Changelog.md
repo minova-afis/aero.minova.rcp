@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Änderungen
 - Export in Clipboard anpassen, Einstellungen für CSV Export, Übersetzungen ab i18n 12.27.0
+- Neue Icons für Indexexport
 
 
 ## [12.14.1] - 15.01.2025
