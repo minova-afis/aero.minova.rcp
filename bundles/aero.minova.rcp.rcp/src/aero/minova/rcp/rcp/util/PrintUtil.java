@@ -130,7 +130,7 @@ public class PrintUtil {
 	public static Preview checkPreview(MPerspective mPerspective, EModelService modelService, EPartService partService) {
 
 		// Wir suchen mal nach dem Druck-Part und aktivieren ihn
-		MPart previewPart = (MPart) modelService.find(Preview.PART_ID, mPerspective);
+		MPart previewPart = (MPart) modelService.find(Constants.PREVIEW_PART, mPerspective);
 		if (previewPart.getObject() == null) {
 			partService.showPart(previewPart, PartState.CREATE);
 		}

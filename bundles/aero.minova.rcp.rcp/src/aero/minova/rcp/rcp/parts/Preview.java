@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Display;
  * @since 11.0.0
  */
 public class Preview {
-	public static final String PART_ID = "aero.minova.rcp.rcp.part.formpreview";
 
 	@Inject
 	protected EPartService partService;
