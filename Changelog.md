@@ -18,6 +18,14 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Fehler in DataService besser loggen
 - IndexOutOfBounds in getValue von Rows abfangen
 
+## [12.14.2] - 23.01.2025
+
+### Änderungen
+- Export in Clipboard anpassen, Einstellungen für CSV Export, Übersetzungen ab i18n 12.27.0
+- Neue Icons für Indexexport
+
+
+
 ## [12.14.1] - 15.01.2025
 
 ### Änderung

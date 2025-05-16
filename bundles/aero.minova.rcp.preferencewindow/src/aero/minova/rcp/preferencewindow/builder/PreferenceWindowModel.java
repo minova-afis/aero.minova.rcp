@@ -155,6 +155,10 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.Table.TableSelectionBufferMs.Tooltip", null), 0.1, DisplayType.INTEGER, 150));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_LIMIT, translationService.translate("@Preferences.Table.IndexLimit", null),
 				translationService.translate("@Preferences.Table.IndexLimit.Tooltip", null), 0.2, DisplayType.INTEGER, 1000));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_CSV_SEPARATOR, translationService.translate("@Preferences.Table.CSVSeparator", null),
+				null, 0.3, DisplayType.STRING, ","));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_CSV_BRACKETS, translationService.translate("@Preferences.Table.CSVBrackets", null), null,
+				0.4, DisplayType.STRING, "\""));
 
 		psd = new PreferenceSectionDescriptor("Timeout", translationService.translate("@Preferences.Timeout", null), 0.4);
 		ptd.add(psd);

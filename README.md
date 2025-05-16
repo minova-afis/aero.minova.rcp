@@ -1,6 +1,6 @@
 # aero.minova.rcp
 
-Der Standard RCP Fatclient von MINOVA
+Der Standard RCP/FreeTables Fatclient von MINOVA
 
 
 Die Dokumentation ist im [Wiki](https://github.com/minova-afis/aero.minova.rcp/wiki) dieses Projekts zu finden.
