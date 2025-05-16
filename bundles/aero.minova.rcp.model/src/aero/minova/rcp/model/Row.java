@@ -12,7 +12,7 @@ public class Row {
 	}
 
 	public Value getValue(int index) {
-		return values.get(index);
+		return index >= 0 && index < values.size() ? values.get(index) : null;
 	}
 
 	public void setValue(Value value, int index) {
