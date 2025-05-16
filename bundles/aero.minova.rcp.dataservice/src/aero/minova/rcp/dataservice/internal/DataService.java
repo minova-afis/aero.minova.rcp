@@ -1019,6 +1019,10 @@ public class DataService implements IDataService {
 	public void postError(ErrorObject value) {
 		// Selbe Fehlermeldung höchstens alle minTimeBetweenError Sekunden anzeigen
 		if ((System.currentTimeMillis() - timeOfLastErrorMessage.getOrDefault(value.getMessage(), (long) -1)) > minTimeBetweenError * 1000) {
+			if (value.getT() != null) {
+				logger.error("", value.getT());
+			}
+			
 			Map<String, Object> data = new HashMap<>(2);
 			data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERROR);
 			data.put(IEventBroker.DATA, value);
@@ -1027,8 +1031,9 @@ public class DataService implements IDataService {
 
 			timeOfLastErrorMessage.put(value.getMessage(), System.currentTimeMillis());
 
-			log("CAS Error:\n" + value.getErrorTable().getRows().get(0).getValue(0).getStringValue() + "\nUser: " + value.getUser() + "\nProcedure/View: "
-					+ value.getProcedureOrView());
+			log("CAS Error:\n" + (value.getErrorTable() != null ? value.getErrorTable().getValue(0, 0).getStringValue() : value.getMessage()) + "\nUser: "
+					+ value.getUser() + "\nProcedure/View: " + value.getProcedureOrView());
+
 		}
 	}
 
