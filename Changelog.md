@@ -14,6 +14,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Bugfixes
+- Fehler in DataService besser loggen
+- IndexOutOfBounds in getValue von Rows abfangen
+
 ## [12.14.1] - 15.01.2025
 
 ### Änderung
