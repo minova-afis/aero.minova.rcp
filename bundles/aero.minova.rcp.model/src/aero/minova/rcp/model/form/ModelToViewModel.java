@@ -165,6 +165,7 @@ public class ModelToViewModel {
 		if (field.getParamString() != null) {
 			MParamStringField f = new MParamStringField(locale);
 			f.setSubFields(field.getParamString().getField());
+			f.setJson(field.getParamString().isJson());
 			return f;
 		}
 

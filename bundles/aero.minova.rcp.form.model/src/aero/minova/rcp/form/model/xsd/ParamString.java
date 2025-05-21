@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="field" type="{}field" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="xml-file" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="json" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -38,6 +39,8 @@ public class ParamString {
     protected List<Field> field;
     @XmlAttribute(name = "xml-file")
     protected String xmlFile;
+    @XmlAttribute(name = "json")
+    protected java.lang.Boolean json;
 
     /**
      * Gets the value of the field property.
@@ -90,6 +93,34 @@ public class ParamString {
      */
     public void setXmlFile(String value) {
         this.xmlFile = value;
+    }
+
+    /**
+     * Ruft den Wert der json-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public boolean isJson() {
+        if (json == null) {
+            return false;
+        } else {
+            return json;
+        }
+    }
+
+    /**
+     * Legt den Wert der json-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public void setJson(java.lang.Boolean value) {
+        this.json = value;
     }
 
 }

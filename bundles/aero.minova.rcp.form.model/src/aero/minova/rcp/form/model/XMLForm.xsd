@@ -309,6 +309,7 @@
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field"/>
 		</xs:sequence>
 		<xs:attribute name="xml-file" type="xs:string" use="optional"/>
+		<xs:attribute name="json" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="type-param">
 		<xs:attribute name="field-name" type="xs:string" use="required"/>

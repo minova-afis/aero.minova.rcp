@@ -67,5 +67,15 @@
 			<unit id="org.eclipse.nebula.widgets.nattable.extension.poi.feature.feature.group" version="2.5.0.202411280718"/>
 			<unit id="org.eclipse.nebula.widgets.nattable.extension.poi.feature.source.feature.group" version="2.5.0.202411280718"/>
 		</location>
+		<location includeDependencyDepth="none" includeSource="true" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>org.json</groupId>
+					<artifactId>json</artifactId>
+					<version>20250517</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</location>
 	</locations>
 </target>

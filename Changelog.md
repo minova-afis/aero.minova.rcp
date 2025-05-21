@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Neu
+- ParamString Felder mit JSON unterstützen
+
 ### Bugfixes
 - Fehler in DataService besser loggen
 - IndexOutOfBounds in getValue von Rows abfangen

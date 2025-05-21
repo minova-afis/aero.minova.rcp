@@ -1163,26 +1163,39 @@ public class WFCDetailCASRequestsUtil {
 	 * @param formName
 	 */
 	public void updateParamStringField(MParamStringField mParamString, String formName) {
-
-		List<Field> subfields = new ArrayList<>();
-
+		Form f = null;
 		if (formName != null) {
-			Form f = dataFormService.getForm(formName);
-
+			f = dataFormService.getForm(formName);
 			if (f == null) {
 				broker.send(Constants.BROKER_SHOWERRORMESSAGE, "@msg.FormForParamStringNotFound %" + formName);
 				return;
 			}
 
-			getSubFields(subfields, f);
 		}
+		updateParamStringField(mParamString, f);
+	}
+
+	/**
+	 * Das übergebene MParamStringField wird mit den Feldern aus der übergebenen Maske geladen. Dafür wird die gesamte Section neu gezeichnet
+	 *
+	 * @param mParamString
+	 * @param formName
+	 */
+	public void updateParamStringField(MParamStringField mParamString, Form f) {
+		List<Field> subfields = getSubFields(f);
 
 		mParamString.getSubFields().clear();
 		mParamString.getSubFields().addAll(subfields);
 		redrawSection(mParamString.getMSection());
 	}
 
-	private void getSubFields(List<Field> subfields, Form f) {
+	private List<Field> getSubFields(Form f) {
+		List<Field> subfields = new ArrayList<>();
+
+		if (f == null) {
+			return subfields;
+		}
+
 		for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
 			List<Object> fieldsOrGrids = new ArrayList<>();
 
@@ -1198,6 +1211,7 @@ public class WFCDetailCASRequestsUtil {
 				}
 			}
 		}
+		return subfields;
 	}
 
 	private void updateGridLookupValues() {
