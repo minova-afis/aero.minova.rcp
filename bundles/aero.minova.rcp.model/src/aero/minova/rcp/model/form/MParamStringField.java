@@ -9,6 +9,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
+import aero.minova.rcp.model.util.ParamJsonUtil;
 import aero.minova.rcp.model.util.ParamStringUtil;
 
 public class MParamStringField extends MField implements ValueChangeListener {
@@ -24,6 +25,7 @@ public class MParamStringField extends MField implements ValueChangeListener {
 	private List<Field> subFields;
 	private Locale locale;
 	private Value cacheValue;
+	private boolean isJson = false;
 
 	public List<MField> getSubMFields() {
 		return subMFields;
@@ -61,38 +63,46 @@ public class MParamStringField extends MField implements ValueChangeListener {
 		cacheValue = value;
 
 		// Alle Unterfelder leeren
-		if (value == null || value.getStringValue() == null) {
+		if (value == null || value.getStringValue() == null || value.getStringValue().isBlank()) {
 			for (MField subMField : subMFields) {
 				subMField.setValue(null, user);
 			}
 			return;
 		}
 
-		// String parsen
-		List<Value> values = ParamStringUtil.convertStringParameterToValues(value.getStringValue(), locale);
+		if (!isJson) {
+			// String parsen
+			List<Value> values = ParamStringUtil.convertStringParameterToValues(value.getStringValue(), locale);
 
-		// Unterfelder füllen
-		try {
-			for (int i = 0; i < subMFields.size(); i++) {
-				subMFields.get(i).setValue(values.get(i), false);
+			// Unterfelder füllen
+			try {
+				for (int i = 0; i < subMFields.size(); i++) {
+					subMFields.get(i).setValue(values.get(i), false);
+				}
+			} catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+				// Wenn gerade ein neuer Datensatz geladen wurde passen die Werte und Felder evtl nicht zusammen
 			}
-		} catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-			// Wenn gerade ein neuer Datensatz geladen wurde passen die Werte und Felder evtl nicht zusammen
+		} else {
+			ParamJsonUtil.convertJsonParameterToValues(value.getStringValue(), subMFields);
 		}
 	}
 
 	@Override
 	public Value getValue() {
 
-		List<Value> values = new ArrayList<>();
+		if (!isJson) {
+			List<Value> values = new ArrayList<>();
 
-		for (MField subMField : subMFields) {
-			values.add(subMField.getValue());
+			for (MField subMField : subMFields) {
+				values.add(subMField.getValue());
+			}
+
+			String paramString = ParamStringUtil.convertValuesToStringParameter(values, locale);
+
+			return new Value(paramString);
+		} else {
+			return new Value(ParamJsonUtil.convertValuesToJson(subMFields));
 		}
-
-		String paramString = ParamStringUtil.convertValuesToStringParameter(values, locale);
-
-		return new Value(paramString);
 	}
 
 	@Override
@@ -129,6 +139,14 @@ public class MParamStringField extends MField implements ValueChangeListener {
 			}
 		}
 		return true;
+	}
+
+	public boolean isJson() {
+		return isJson;
+	}
+
+	public void setJson(boolean isJson) {
+		this.isJson = isJson;
 	}
 
 }
