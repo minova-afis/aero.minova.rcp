@@ -8,7 +8,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.Value;
@@ -23,11 +24,11 @@ public class ParamJsonUtil {
 			return null;
 		}
 
-		JSONObject jsonObj = new JSONObject();
+		JsonObject jsonObj = new JsonObject();
 
 		for (MField f : subMFields) {
 			if (f.getValue() != null) {
-				jsonObj.put(f.getName(), getValueAsString(f.getValue(), f.getDateTimeType()));
+				jsonObj.addProperty(f.getName(), getValueAsString(f.getValue(), f.getDateTimeType()));
 			}
 		}
 
@@ -37,13 +38,13 @@ public class ParamJsonUtil {
 
 	public static void convertJsonParameterToValues(String value, List<MField> subMFields) {
 
-		JSONObject jsonObj = new JSONObject(value);
+		JsonObject jsonObject = new JsonParser().parse(value).getAsJsonObject();
 
 		for (MField f : subMFields) {
 			Value v = null;
 
-			if (jsonObj.has(f.getName())) {
-				v = getValue(f, jsonObj.get(f.getName()));
+			if (jsonObject.has(f.getName())) {
+				v = getValue(f, jsonObject.get(f.getName()).getAsString());
 			}
 
 			f.setValue(v, false);

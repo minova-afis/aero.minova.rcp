@@ -8,7 +8,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.osgi,
  org.eclipse.core.jobs,
  org.eclipse.e4.ui.di,
- json,
  com.google.gson,
  org.eclipse.core.runtime,
  org.eclipse.swt,
