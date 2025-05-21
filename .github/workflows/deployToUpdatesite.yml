@@ -42,8 +42,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
       run: |
-        git config user.email "service@minova.com"
-        git config user.name "minova-worker"
+        git config --global user.email "service@minova.com"
+        git config --global user.name "minova-worker"
         git clone https://minova-worker:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite
         cd aero.minova.rcp.updatesite
         rm -fr * 
