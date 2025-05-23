@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.15.0] - 23.05.2025
+
 ### Neu
 - ParamString Felder mit JSON unterstützen
 
