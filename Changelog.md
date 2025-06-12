@@ -15,6 +15,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## Unreleased
 
 ### Neu
+- Einfachen Information-Dialog unterstützen
 - ParamString Felder mit JSON unterstützen
 
 ### Bugfixes

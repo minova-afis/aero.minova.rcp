@@ -53,6 +53,7 @@ public class NotificationAndErrorAddon {
 	ILog logger = Platform.getLog(this.getClass());
 
 	private static final String ERROR = "Error";
+	private static final String INFO = "Information";
 	private static final String DEFAULT = "DEFAULT";
 
 	/**
@@ -76,6 +77,15 @@ public class NotificationAndErrorAddon {
 		selectSearchPart();
 
 		MessageDialog.openError(shell, getTranslation(ERROR), getTranslation(message));
+	}
+
+	@Inject
+	@Optional
+	public void showInformationMessage(@UIEventTopic(Constants.BROKER_SHOWINFORMATIONMESSAGE) String message) {
+		// Fokus auf den Search Part legen, damit Fehlermeldungen nicht mehrmals angezeigt werden
+		selectSearchPart();
+
+		MessageDialog.openInformation(shell, getTranslation(INFO), getTranslation(message));
 	}
 
 	@Inject
