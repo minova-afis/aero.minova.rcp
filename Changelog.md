@@ -14,7 +14,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
-### Neu
+## [12.15.1] - 12.06.2025
 - Einfachen Information-Dialog unterstützen
 
 ## [12.15.0] - 23.05.2025
