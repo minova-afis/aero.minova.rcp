@@ -143,7 +143,8 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.ShowDiscardChangesDialogIndex", null),
 				translationService.translate("@Preferences.ShowDiscardChangesDialogIndex.Tooltip", null), 0.6, DisplayType.CHECK, false));
 
-		boolean xbsShowDelete = Boolean.parseBoolean(xbsPreferences.get(Constants.XBS_SHOW_DELETE_DIALOG)); // Default aus xbs nehmen
+		String xbsShowDeleteString = xbsPreferences.get(Constants.XBS_SHOW_DELETE_DIALOG);
+		boolean xbsShowDelete = xbsShowDeleteString == null || Boolean.parseBoolean(xbsShowDeleteString); // xbs
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DELETE_WARNING, translationService.translate("@Preferences.ShowDeleteWarning", null), null,
 				0.8, DisplayType.CHECK, xbsShowDelete));
 
@@ -154,6 +155,10 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.Table.TableSelectionBufferMs.Tooltip", null), 0.1, DisplayType.INTEGER, 150));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_LIMIT, translationService.translate("@Preferences.Table.IndexLimit", null),
 				translationService.translate("@Preferences.Table.IndexLimit.Tooltip", null), 0.2, DisplayType.INTEGER, 1000));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_CSV_SEPARATOR, translationService.translate("@Preferences.Table.CSVSeparator", null),
+				null, 0.3, DisplayType.STRING, ","));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_CSV_BRACKETS, translationService.translate("@Preferences.Table.CSVBrackets", null), null,
+				0.4, DisplayType.STRING, "\""));
 
 		psd = new PreferenceSectionDescriptor("Timeout", translationService.translate("@Preferences.Timeout", null), 0.4);
 		ptd.add(psd);

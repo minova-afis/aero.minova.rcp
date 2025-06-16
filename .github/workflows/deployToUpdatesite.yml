@@ -37,21 +37,21 @@ jobs:
       env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+    
     - name: Deploy 🚀
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUBACTION_TOKEN_SECRET }}
+        GITHUB_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
       run: |
-        git config --global user.email "erlanger@minova.com"
-        git config --global user.name "CE7"
-        echo $GITHUB_TOKEN
-        git clone https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite
+        git config --global user.email "service@minova.com"
+        git config --global user.name "minova-worker"
+        git clone https://minova-worker:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite
         cd aero.minova.rcp.updatesite
         rm -fr * 
         pwd
         cp -r ../releng/aero.minova.rcp.update/target/repository/* .
         git add .
         git commit -m "${{ github.event.inputs.description }}"
-        git push -f https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite HEAD:main
+        git push -f https://minova-worker:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite HEAD:main
         
       
      

@@ -23,6 +23,8 @@ public class Constants {
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
 
+	public static final String CUSTOMER_PRINT_DATA = "CustomerPrintData";
+
 	public static final String TABLE_KEYTEXT = "KeyText";
 	public static final String TABLE_KEYLONG = "KeyLong";
 	public static final String TABLE_DESCRIPTION = "Description";
@@ -111,6 +113,10 @@ public class Constants {
 	 * Benutzt mit einem String, öffnet einen einfachen Fehler-Dialog
 	 */
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
+	/**
+	 * Benutzt mit einem String, öffnet einen einfachen Information-Dialog
+	 */
+	public static final String BROKER_SHOWINFORMATIONMESSAGE = "aero/minova/rcp/ShowInformationMessage";
 
 	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
 	public static final String BROKER_SENDEVENTTOHELPER = "aero/minova/rcp/SendEventToHelper";

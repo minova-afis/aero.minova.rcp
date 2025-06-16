@@ -14,6 +14,52 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.15.1] - 12.06.2025
+- Einfachen Information-Dialog unterstützen
+
+## [12.15.0] - 23.05.2025
+- ParamString Felder mit JSON unterstützen
+
+### Bugfixes
+- Fehler in DataService besser loggen
+- IndexOutOfBounds in getValue von Rows abfangen
+
+## [12.14.2] - 23.01.2025
+
+### Änderungen
+- Export in Clipboard anpassen, Einstellungen für CSV Export, Übersetzungen ab i18n 12.27.0
+- Neue Icons für Indexexport
+
+
+
+## [12.14.1] - 15.01.2025
+
+### Änderung
+- Index-Aggregat Funktionen für Datum-/Zeitfelder unterstützen
+
+### Bugfixes
+- Beschreibung von Lookups wieder anzeigen
+- Nur drucken, wenn in Titel-Dialog auf OK geklickt wird
+- Fehler beim Erstellen der XML für Indexdruck in UI anzeigen, Übersetzungen ab i18n 12.26.0
+- Fehler beim Indexdruck beheben
+
+## [12.14.0] - 06.12.2024
+
+### Neu
+- Index-, Detail- und Statistikdruck mit Kundendaten
+- Indexdruck-Überschrift kann erweitert werden (Übersetzungen ab i18n 12.25.1)
+- Nattable Version 2.5.0
+
+### Änderung
+- description-name="" in Lookups um keine Beschreibungs-Spalte anzufragen
+- Excel Export als .xlsx statt .xls
+
+### Bugfixes
+- Tests laufen auf Github wieder durch
+- Filtern von Lookups mit Übersetzungen korrigieren
+- Spaltennamen beim Export als CSV korrigieren
+- Ausgeblendete Spalten nicht Drucken oder Exportieren
+
 
 ## [12.13.2] - 07.08.2024
 

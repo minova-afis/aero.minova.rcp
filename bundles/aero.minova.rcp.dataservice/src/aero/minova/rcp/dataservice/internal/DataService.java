@@ -764,10 +764,9 @@ public class DataService implements IDataService {
 				if (ta != null) {
 					for (Row r : ta.getRows()) {
 						LookupValue lv = new LookupValue(//
-								r.getValue(0).getIntegerValue(), //
-								r.getValue(1).getStringValue(), //
-								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-
+								ta.getValue(Constants.TABLE_KEYLONG, r).getIntegerValue(), //
+								ta.getValue(Constants.TABLE_KEYTEXT, r).getStringValue(), //
+								ta.getValue(lookupDescriptionColumnName, r) == null ? null : ta.getValue(lookupDescriptionColumnName, r).getStringValue());
 						map.put(lv.keyLong, lv);
 						list.add(lv);
 					}
@@ -784,15 +783,20 @@ public class DataService implements IDataService {
 		Table t = TableBuilder.newTable(tableName) //
 				.withColumn(Constants.TABLE_KEYLONG, DataType.INTEGER)//
 				.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
-				.withColumn(lookupDescriptionColumnName, DataType.STRING)//
 				.withColumn(Constants.TABLE_LASTACTION, DataType.INTEGER)//
 				.create();
+
 		Row row = RowBuilder.newRow() //
 				.withValue(keyLong) //
 				.withValue(keyText) //
-				.withValue(null) //
 				.withValue(resolve || !filterLastAction ? null : fv) // Bei Resolve oder FilterLastAction=false nicht nach LastAction filtern #1482
 				.create();
+
+		if (!lookupDescriptionColumnName.isBlank()) {
+			t.addColumn(new Column(lookupDescriptionColumnName, DataType.STRING));
+			row.addValue(null);
+		}
+
 		t.addRow(row);
 		return t;
 	}
@@ -878,9 +882,9 @@ public class DataService implements IDataService {
 				if (ta != null) {
 					for (Row r : ta.getRows()) {
 						LookupValue lv = new LookupValue(//
-								r.getValue(0).getIntegerValue(), //
-								r.getValue(1).getStringValue(), //
-								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+								ta.getValue(Constants.TABLE_KEYLONG, r).getIntegerValue(), //
+								ta.getValue(Constants.TABLE_KEYTEXT, r).getStringValue(), //
+								ta.getValue(Constants.TABLE_DESCRIPTION, r) == null ? null : ta.getValue(Constants.TABLE_DESCRIPTION, r).getStringValue());
 						map.put(lv.keyLong, lv);
 						list.add(lv);
 					}
@@ -1015,6 +1019,10 @@ public class DataService implements IDataService {
 	public void postError(ErrorObject value) {
 		// Selbe Fehlermeldung höchstens alle minTimeBetweenError Sekunden anzeigen
 		if ((System.currentTimeMillis() - timeOfLastErrorMessage.getOrDefault(value.getMessage(), (long) -1)) > minTimeBetweenError * 1000) {
+			if (value.getT() != null) {
+				logger.error("", value.getT());
+			}
+			
 			Map<String, Object> data = new HashMap<>(2);
 			data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERROR);
 			data.put(IEventBroker.DATA, value);
@@ -1023,8 +1031,9 @@ public class DataService implements IDataService {
 
 			timeOfLastErrorMessage.put(value.getMessage(), System.currentTimeMillis());
 
-			log("CAS Error:\n" + value.getErrorTable().getRows().get(0).getValue(0).getStringValue() + "\nUser: " + value.getUser() + "\nProcedure/View: "
-					+ value.getProcedureOrView());
+			log("CAS Error:\n" + (value.getErrorTable() != null ? value.getErrorTable().getValue(0, 0).getStringValue() : value.getMessage()) + "\nUser: "
+					+ value.getUser() + "\nProcedure/View: " + value.getProcedureOrView());
+
 		}
 	}
 

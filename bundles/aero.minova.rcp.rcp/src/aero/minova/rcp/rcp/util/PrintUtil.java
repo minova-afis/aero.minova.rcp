@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -22,6 +23,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Table;
@@ -36,8 +38,9 @@ public class PrintUtil {
 
 	static ILog logger = Platform.getLog(PrintUtil.class);
 
-	public static void getXMLAndShowPDF(IDataService dataService, EModelService modelService, EPartService partService, TranslationService translationService,
-			UISynchronize sync, Table table, String rootElement, String xslPath, String resultPath, MPerspective mPerspective, boolean disablePreview) {
+	public static void getXMLAndShowPDF(IDataService dataService, EModelService modelService, EPartService partService, MApplication mApplication,
+			TranslationService translationService, UISynchronize sync, Table table, String rootElement, String xslPath, String resultPath,
+			MPerspective mPerspective, boolean disablePreview) {
 
 		CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table, rootElement);
 		tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
@@ -50,6 +53,11 @@ public class PrintUtil {
 				Path pdfPath = dataService.getStoragePath().resolve(resultPath);
 				URL pdfFile = pdfPath.toFile().toURI().toURL();
 				String xmlString = Files.readString(xmlPath);
+
+				CustomerPrintData printData = (CustomerPrintData) mApplication.getTransientData().get(Constants.CUSTOMER_PRINT_DATA);
+				if (printData != null) {
+					xmlString = xmlString.replace("</" + rootElement + ">", printData.getXMLString() + "</" + rootElement + ">");
+				}
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
 				if (!disablePreview) {

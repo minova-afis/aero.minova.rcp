@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -19,16 +20,19 @@ import javax.xml.transform.TransformerException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.jface.window.Window;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
@@ -40,12 +44,15 @@ import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.xml.sax.SAXException;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.internal.FileUtil;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferences.ApplicationPreferences;
@@ -55,9 +62,13 @@ import aero.minova.rcp.rcp.print.ColumnInfo;
 import aero.minova.rcp.rcp.print.ReportConfiguration;
 import aero.minova.rcp.rcp.print.ReportCreationException;
 import aero.minova.rcp.rcp.print.TableXSLCreator;
+import aero.minova.rcp.rcp.util.CustomerPrintData;
+import aero.minova.rcp.rcp.util.PrintIndexDialog;
 import aero.minova.rcp.rcp.util.PrintUtil;
 import aero.minova.rcp.util.DateTimeUtil;
+import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.util.IOUtil;
+import aero.minova.rcp.util.TimeUtil;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TreeList;
 
@@ -79,6 +90,9 @@ public class PrintIndexHandler {
 
 	@Inject
 	private MPerspective mPerspective;
+
+	@Inject
+	private MApplication mApplication;
 
 	ILog logger = Platform.getLog(this.getClass());
 
@@ -138,7 +152,8 @@ public class PrintIndexHandler {
 	}
 
 	@Execute
-	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window) {
+	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, @Named(IServiceConstants.ACTIVE_SHELL) final Shell shell, MPart mpart,
+			MWindow window) {
 
 		String xmlRootTag = null;
 		String title = null;
@@ -149,11 +164,20 @@ public class PrintIndexHandler {
 		Path pathReports = dataService.getStoragePath().resolve("pdf/");
 		String xslString = null;
 		if (o instanceof WFCIndexPart indexPart) {
+
+			// Nach zusätzlichem Titel fragen
+			IEclipseContext context = mPerspective.getContext();
+			String searchConfigName = (String) context.get("ConfigName");
+			final PrintIndexDialog pid = new PrintIndexDialog(shell, translationService, searchConfigName);
+			if (pid.open() == Window.CANCEL) {
+				return;
+			}
+			String customTitle = pid.getTitle();
+
 			Table data = indexPart.getData();
 			xmlRootTag = data.getName();
 			SortedList<Row> sortedDataList = indexPart.getSortedList();
 			ColumnReorderLayer columnReorderLayer = indexPart.getBodyLayerStack().getColumnReorderLayer();
-			columnReorderLayer.getColumnIndexOrder();
 
 			// Gruppierung
 			@SuppressWarnings("unchecked")
@@ -184,14 +208,25 @@ public class PrintIndexHandler {
 			try {
 				TableXSLCreator tableCreator = new TableXSLCreator(this, ePartService);
 				ContextInjectionFactory.inject(tableCreator, mPerspective.getContext());
-				xslString = tableCreator.createXSL(xmlRootTag, title, colConfig, rConfig, pathReports, groupByIndicesReordered);
+
+				String titleInReport = title;
+				if (customTitle != null && !customTitle.isBlank()) {
+					titleInReport += "</fo:block>" + System.lineSeparator() + "<fo:block text-align=\"center\">" + customTitle;
+				}
+				xslString = tableCreator.createXSL(xmlRootTag, titleInReport, colConfig, rConfig, pathReports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				logger.error(e.getMessage(), e);
 			}
 
-			String xmlString = createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xmlRootTag, title);
+			try {
+				String xmlString = createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xmlRootTag, title);
 
-			saveAndShowPDF(xmlRootTag, title, xslString, xmlString);
+				saveAndShowPDF(xmlRootTag, title, xslString, xmlString);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+						translationService.translate("@msg.ErrorCreatingXML", null), e);
+			}
 		}
 	}
 
@@ -228,7 +263,7 @@ public class PrintIndexHandler {
 				PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(mPerspective, eModelService, ePartService));
 			}
 		} catch (IOException | SAXException | TransformerException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
 					translationService.translate("@msg.ErrorShowingFile", null), e);
 		}
@@ -328,7 +363,7 @@ public class PrintIndexHandler {
 		} else {
 			addGroupByRows(indexPart, treeList, groupByIndices, colConfig, columnReorderList, xml, layer);
 		}
-		addFinalSummary(xml, indexPart, colConfig);
+		addFinalSummary(xml, indexPart, colConfig, columnReorderList);
 		xml.append("</Group>\n");
 
 		xml.append("</IndexView>\n");
@@ -389,7 +424,8 @@ public class PrintIndexHandler {
 				Object colVal = gbo.getDescriptor().get(i);
 				colValString = colVal.toString();
 				if (colVal instanceof Instant instant) {
-					colValString = DateTimeUtil.getDateTimeString(instant, CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone);
+					colValString = formatInstant(instant, CustomLocale.getLocale(), colConfig.get(columnReorderList.indexOf(i)).column.getDateTimeType(),
+							dateUtilPref, timeUtilPref, timezone);
 				}
 				tableTitle.append(colName + ": " + colValString + ", ");
 			}
@@ -406,10 +442,8 @@ public class PrintIndexHandler {
 		xml.append("<Rows>\n");
 		for (Object o : list) {
 			if (o instanceof Row r) {
-
-				int colIndex = 0;
 				xml.append("<Row>\n");
-				addRowString(xml, colConfig, columnReorderList, r, colIndex);
+				addRowString(xml, colConfig, columnReorderList, r);
 				xml.append("</Row>\n");
 			}
 		}
@@ -417,15 +451,21 @@ public class PrintIndexHandler {
 
 	}
 
-	private void addRowString(StringBuilder xml, List<ColumnInfo> colConfig, List<Integer> columnReorderList, Row r, int colIndex) {
+	private void addRowString(StringBuilder xml, List<ColumnInfo> colConfig, List<Integer> columnReorderList, Row r) {
+		int colIndex = 0;
 		for (final Integer d : columnReorderList) {
+
 			Column c = colConfig.get(colIndex).column;
+
+			if (!c.isVisible()) {
+				colIndex++;
+				continue;
+			}
+
 			xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">");
 			if (r.getValue(d) != null) {
 				if (r.getValue(d).getType() == DataType.DOUBLE) {
 					xml.append(colConfig.get(colIndex).numberFormat.format(r.getValue(d).getDoubleValue()));
-				} else if (r.getValue(d).getType() == DataType.INTEGER) {
-					xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone));
 				} else if (r.getValue(d).getType() == DataType.BOOLEAN && Boolean.TRUE.equals(r.getValue(d).getBooleanValue())) {
 					xml.append(1);
 				} else {
@@ -446,8 +486,8 @@ public class PrintIndexHandler {
 
 		int indexInSummary = 0;
 		for (int i = 0; i < colConfig.size(); i++) {
-
-			if (!colConfig.get(i).column.isVisible()) {
+			Column c = colConfig.get(i).column;
+			if (!c.isVisible()) {
 				continue;
 			}
 
@@ -457,20 +497,20 @@ public class PrintIndexHandler {
 					.getGroupBySummaryProvider(labelStack);
 
 			if (summaryProvider != null) {
-				int columnIndex = columnReorderList.get(i);
 				@SuppressWarnings("unchecked")
 				List<Row> children = ((GroupByDataLayer<Row>) indexPart.getBodyLayerStack().getBodyDataLayer()).getItemsInGroup(gbo);
-				Object summary = summaryProvider.summarize(columnIndex, children);
-				if (summary instanceof Double) {
+				Object summary = summaryProvider.summarize(columnReorderList.get(i), children);
+				if (summary instanceof Double && colConfig.get(i).numberFormat != null) {
 					summary = colConfig.get(i).numberFormat.format(summary);
 				}
+				if (summary instanceof Instant inst) {
+					summary = formatInstant(inst, CustomLocale.getLocale(), c.getDateTimeType(), dateUtilPref, timeUtilPref, timezone);
+				}
 
-				Column c = colConfig.get(i).column;
 				sumRow.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">");
 				sumRow.append(summary);
 				sumRow.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">\n");
 			}
-
 			indexInSummary++;
 		}
 
@@ -478,29 +518,30 @@ public class PrintIndexHandler {
 		return sumRow.toString();
 	}
 
-	private void addFinalSummary(StringBuilder xml, WFCIndexPart indexPart, List<ColumnInfo> colConfig) {
+	private void addFinalSummary(StringBuilder xml, WFCIndexPart indexPart, List<ColumnInfo> colConfig, List<Integer> columnReorderList) {
 		xml.append("<SumRow>\n");
 
 		FixedSummaryRowLayer summaryLayer = indexPart.getSummaryRowLayer();
 
 		int indexInSummary = 0;
 		for (int i = 0; i < colConfig.size(); i++) {
-
-			if (!colConfig.get(i).column.isVisible()) {
+			Column c = colConfig.get(i).column;
+			if (!c.isVisible()) {
 				continue;
 			}
 
 			Object summary = summaryLayer.getDataValueByPosition(indexInSummary, 0);
-			if (summary instanceof Double) {
+			if (summary instanceof Double && colConfig.get(i).numberFormat != null) {
 				summary = colConfig.get(i).numberFormat.format(summary);
 			}
+			if (summary instanceof Instant inst) {
+				summary = formatInstant(inst, CustomLocale.getLocale(), c.getDateTimeType(), dateUtilPref, timeUtilPref, timezone);
+			}
 			if (summary != null) {
-				Column c = colConfig.get(i).column;
 				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">");
 				xml.append(summary);
 				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">\n");
 			}
-
 			indexInSummary++;
 		}
 
@@ -514,21 +555,29 @@ public class PrintIndexHandler {
 	 * @param filename
 	 */
 	private void addHeader(StringBuilder xml, String filename) {
+		CustomerPrintData printData = (CustomerPrintData) mApplication.getTransientData().get(Constants.CUSTOMER_PRINT_DATA);
+
 		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 		xml.append("<" + filename + ">\n");
-		xml.append("""
-				<Site>
-				<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>
-				<Address2><![CDATA[Leightonstraße 2]]></Address2>
-				<Address3><![CDATA[97074 Würzburg]]></Address3>
-				<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>
-				<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>
-				<Application>WFC</Application>
-				<Logo>logo.gif</Logo>
-				</Site>""");
-		xml.append("<PrintDate><![CDATA["
-				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0", timezone), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone)
+		xml.append(printData.getXMLString());
+		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(Instant.now(), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone)
 				+ "]]></PrintDate>\n");
+	}
+
+	private String formatInstant(Instant i, Locale locale, DateTimeType dateTimeType, String datePattern, String timePattern, String timezone) {
+		String returnValue = "";
+		switch (dateTimeType) {
+		case TIME:
+			returnValue = TimeUtil.getTimeString(i, locale, timePattern);
+			break;
+		case DATE:
+			returnValue = DateUtil.getDateString(i, locale, datePattern);
+			break;
+		case DATETIME:
+			returnValue = DateTimeUtil.getDateTimeString(i, locale, datePattern, timePattern, timezone);
+			break;
+		}
+		return returnValue;
 	}
 
 }

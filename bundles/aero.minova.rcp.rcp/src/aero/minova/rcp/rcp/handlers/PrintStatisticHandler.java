@@ -150,8 +150,9 @@ public class PrintStatisticHandler implements ValueChangeListener {
 			}
 			table.addRow(row);
 
-			PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, sync, table, rootElement, "reports/" + reportName,
-					"outputReports/" + statisticPart.getCurrentRow().getValue(0).getStringValue() + ".pdf", mPerspective, disablePreview);
+			PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, mApplication, translationService, sync, table, rootElement,
+					"reports/" + reportName, "outputReports/" + statisticPart.getCurrentRow().getValue(0).getStringValue() + ".pdf", mPerspective,
+					disablePreview);
 
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);

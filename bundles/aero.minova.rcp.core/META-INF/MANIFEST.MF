@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Core
 Bundle-SymbolicName: aero.minova.rcp.core
-Bundle-Version: 12.13.2.qualifier
+Bundle-Version: 12.15.1.qualifier
 Automatic-Module-Name: aero.minova.rcp.core
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.swt

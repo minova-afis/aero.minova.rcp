@@ -209,6 +209,20 @@ public class ApplicationPreferences {
 	public static final String TABLE_SELECTION_BUFFER_MS = "TableSelectionBufferMs";
 
 	/**
+	 * Das Trennzeichen, dass beim Export des Index als CSV verwendet wird. Default: ,
+	 * 
+	 * @see ApplicationPreferences#PREFERENCES_NODE
+	 */
+	public static final String INDEX_CSV_SEPARATOR = "IndexCSVSeparator";
+
+	/**
+	 * Das Zeichen, mit dem Werte beim Export des Index als CSV umgeben werden. Default: "
+	 * 
+	 * @see ApplicationPreferences#PREFERENCES_NODE
+	 */
+	public static final String INDEX_CSV_BRACKETS = "IndexCSVBrackets";
+
+	/**
 	 * Masken Puffer benutzen. ENTFERNEN?!
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
