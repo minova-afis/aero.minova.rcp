@@ -122,6 +122,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Neu
 - "execute-always" Flag in Masken für Grids implementieren
 
+### Änderung
+- Test für Index-Druck
+
 ### Bugfixes
 - 'button-delete-visible' blendet nicht mehr den New Button aus
 - 'button-new-visible' blendet nun den New Button aus
