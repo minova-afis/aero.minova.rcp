@@ -211,6 +211,10 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	 */
 	private void checkCredentials(String pw) throws WorkspaceException, UnsupportedEncodingException {
 
+		if (pw == null) {
+			throw new WorkspaceException("Password invalid, please enter it again");
+		}
+
 		String encodedUser = new String(getUsername().getBytes(), StandardCharsets.ISO_8859_1.toString());
 		String encodedPW = new String(pw.getBytes(), StandardCharsets.ISO_8859_1.toString());
 
