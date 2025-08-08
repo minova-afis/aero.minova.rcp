@@ -164,6 +164,11 @@ class OpenStundenerfassungsUITest {
 		assertTrue(Integer.parseInt(numberEntriesString) > 0);
 	}
 
+	@Test
+	void tmp() {
+		assertTrue(true);
+	}
+
 	@AfterEach
 	void sleep() {
 		bot.sleep(1000);

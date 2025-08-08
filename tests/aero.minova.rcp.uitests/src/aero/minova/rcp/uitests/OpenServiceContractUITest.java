@@ -125,6 +125,11 @@ public class OpenServiceContractUITest {
 		assertEquals(value.getStringValue(), CONTRACT_NAME);
 	}
 
+	@Test
+	void tmp() {
+		assertTrue(true);
+	}
+
 	private void reloadIndex() {
 		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
 

@@ -1,6 +1,7 @@
 package aero.minova.rcp.utiltests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -33,6 +34,11 @@ class ImageUtilUITest {
 		ImageDescriptor imageDescriptorFromImagesBundle = ImageUtil.getImageDescriptor("Book.Command", true);
 		assertEquals(24, imageDescriptorFromImagesBundle.getImageData(100).width);
 		assertEquals(24, imageDescriptorFromImagesBundle.getImageData(100).height);
+	}
+
+	@Test
+	void tmp() {
+		assertTrue(true);
 	}
 
 }
