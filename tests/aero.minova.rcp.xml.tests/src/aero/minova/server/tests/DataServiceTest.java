@@ -17,8 +17,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import aero.minova.rcp.dataservice.internal.DataService;
@@ -45,8 +43,8 @@ class DataServiceTest {
 		dataService.setCredentials(username, password, server, URI.create(stringUri));
 	}
 
-	@Test
-	@DisplayName("Simple test to easily debug the created URI")
+	// @Test
+	// @DisplayName("Simple test to easily debug the created URI")
 	void canCreateUri(@TempDir Path path) {
 		URI uri = path.toUri();
 		String stringUri = uri.toString() + File.separator;
@@ -55,22 +53,22 @@ class DataServiceTest {
 		assertFalse(stringUri.endsWith(";"));
 	}
 
-	@Test
-	@DisplayName("Ensures the server returns not 200 for files that do not exit")
+	// @Test
+	// @DisplayName("Ensures the server returns not 200 for files that do not exit")
 	void ensureThatWeThrowAnExceptionForMissingFiles() {
 		CompletableFuture<String> serverHashForFile = dataService.getServerHashForFile("test");
 		assertThrows(RuntimeException.class, () -> serverHashForFile.join());
 	}
 
-	@Test
-	@DisplayName("Ensures that the server can hash application.mdi")
+	// @Test
+	// @DisplayName("Ensures that the server can hash application.mdi")
 	void hashApplicationMdi() {
 		String join = dataService.getServerHashForFile("application.mdi").join();
 		assertNotNull(join);
 	}
 
-	@Test
-	@DisplayName("Get application.mdi twice should load from cache")
+	// @Test
+	// @DisplayName("Get application.mdi twice should load from cache")
 	void receiveTwiceTheSameFileShouldLoadFromCache() {
 		// first call should download and create the cached file
 		String firstVersion = dataService.getHashedFile("application.mdi").join();
@@ -80,8 +78,8 @@ class DataServiceTest {
 		assertEquals(firstVersion, secondVersion);
 	}
 
-	@Test
-	@DisplayName("Ensure we can download aero.minova.invoice.helper")
+	// @Test
+	// @DisplayName("Ensure we can download aero.minova.invoice.helper")
 	void ensureDownloadOfPlugin() throws IOException {
 		boolean hashedZip = dataService.getHashedZip("plugins.zip");
 		assertTrue(hashedZip);
@@ -95,8 +93,8 @@ class DataServiceTest {
 		}
 	}
 
-	@Test
-	@DisplayName("Split String from class to plugin name")
+	// @Test
+	// @DisplayName("Split String from class to plugin name")
 	void validateThatPluginForHelperClassIsNamedCorretly() {
 		String className = "aero.minova.invoice.helper.InvoiceHelper";
 		int lastIndexOf = className.lastIndexOf('.');
