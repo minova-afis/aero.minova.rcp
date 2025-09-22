@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Änderung
 - Aussagekräftiger Fehler, wenn Passwort im Login-Dialog null ist
+- Möglichkeit für Warnungs-Dialog
 
 ## [12.15.1] - 12.06.2025
 - Einfachen Information-Dialog unterstützen

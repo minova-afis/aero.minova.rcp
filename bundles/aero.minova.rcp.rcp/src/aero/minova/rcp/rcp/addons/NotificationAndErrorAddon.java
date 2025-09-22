@@ -54,6 +54,7 @@ public class NotificationAndErrorAddon {
 
 	private static final String ERROR = "Error";
 	private static final String INFO = "Information";
+	private static final String WARNING = "Warning";
 	private static final String DEFAULT = "DEFAULT";
 
 	/**
@@ -86,6 +87,15 @@ public class NotificationAndErrorAddon {
 		selectSearchPart();
 
 		MessageDialog.openInformation(shell, getTranslation(INFO), getTranslation(message));
+	}
+
+	@Inject
+	@Optional
+	public void showWarningMessage(@UIEventTopic(Constants.BROKER_SHOWWARNINGMESSAGE) String message) {
+		// Fokus auf den Search Part legen, damit Fehlermeldungen nicht mehrmals angezeigt werden
+		selectSearchPart();
+
+		MessageDialog.openWarning(shell, getTranslation(WARNING), getTranslation(message));
 	}
 
 	@Inject

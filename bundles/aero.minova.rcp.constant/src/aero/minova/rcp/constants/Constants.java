@@ -117,6 +117,10 @@ public class Constants {
 	 * Benutzt mit einem String, öffnet einen einfachen Information-Dialog
 	 */
 	public static final String BROKER_SHOWINFORMATIONMESSAGE = "aero/minova/rcp/ShowInformationMessage";
+	/**
+	 * Benutzt mit einem String, öffnet einen einfachen Warnungs-Dialog
+	 */
+	public static final String BROKER_SHOWWARNINGMESSAGE = "aero/minova/rcp/ShowWarningMessage";
 
 	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
 	public static final String BROKER_SENDEVENTTOHELPER = "aero/minova/rcp/SendEventToHelper";
