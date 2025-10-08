@@ -137,7 +137,7 @@ public class CreateButtonInDetailUtil {
 		section.setTextClient(bar);
 	}
 
-	private ButtonAccessor createToolItemInSection(final ToolBar bar, aero.minova.rcp.form.model.xsd.Button btn) {
+	public ButtonAccessor createToolItemInSection(final ToolBar bar, aero.minova.rcp.form.model.xsd.Button btn) {
 
 		// Kein Gruppenname: Element nur in Toolbar, kein Menü
 		if (btn.getGroup() == null) {

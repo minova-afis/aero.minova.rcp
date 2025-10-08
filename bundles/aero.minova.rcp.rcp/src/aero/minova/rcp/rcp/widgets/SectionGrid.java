@@ -24,9 +24,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
@@ -79,11 +76,12 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.prefs.BackingStoreException;
@@ -94,7 +92,6 @@ import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.form.model.xsd.Button;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -123,6 +120,7 @@ import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.SummaryRowUtil;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
+import aero.minova.rcp.rcp.util.CreateButtonInDetailUtil;
 import aero.minova.rcp.rcp.util.CustomComparator;
 import aero.minova.rcp.rcp.util.StaticXBSValueUtil;
 import aero.minova.rcp.util.OSUtil;
@@ -144,6 +142,9 @@ public class SectionGrid {
 	private EHandlerService handlerService;
 	@Inject
 	private IDataService dataService;
+
+	@Inject
+	private CreateButtonInDetailUtil createButtonUtil;
 
 	@Inject
 	private Form form;
@@ -171,8 +172,6 @@ public class SectionGrid {
 
 	private SortedList<Row> sortedList;
 	private SelectionLayer selectionLayer;
-
-	private LocalResourceManager resManager;
 
 	private IButtonAccessor deleteToolItemAccessor;
 
@@ -212,7 +211,6 @@ public class SectionGrid {
 		this.grid = grid;
 		this.composite = composite;
 		this.mDetail = mDetail;
-		resManager = new LocalResourceManager(JFaceResources.getResources(), composite);
 
 		rowsToInsert = new ArrayList<>();
 		rowsToUpdate = new ArrayList<>();
@@ -246,96 +244,100 @@ public class SectionGrid {
 
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
-			btnInsert.setId(Constants.CONTROL_GRID_BUTTON_INSERT);
+			btnInsert.setId(grid.getId() + "." + Constants.CONTROL_GRID_BUTTON_INSERT);
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText("@Action.New");
 			btnInsert.setEnabled(true);
-			createToolItem(bar, btnInsert, grid.getId() + "." + btnInsert.getId());
+			createToolItem(bar, btnInsert);
 		}
 
 		if (grid.isButtonDeleteVisible()) {
 			Button btnDel = new Button();
-			btnDel.setId(Constants.CONTROL_GRID_BUTTON_DELETE);
+			btnDel.setId(grid.getId() + "." + Constants.CONTROL_GRID_BUTTON_DELETE);
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setText("@Action.DeleteLine");
 			btnDel.setEnabled(true);
-			createToolItem(bar, btnDel, grid.getId() + "." + btnDel.getId());
+			createToolItem(bar, btnDel);
 		}
 
 		// hier müssen die in der Maske definierten Buttons erstellt werden
 		for (Button btn : grid.getButton()) {
-			createToolItem(bar, btn, btn.getId());
+			createToolItem(bar, btn);
 		}
 
 		// Standard
 		Button btnOptimizeHigh = new Button();
-		btnOptimizeHigh.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT);
+		btnOptimizeHigh.setId(grid.getId() + "." + Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT);
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
 		btnOptimizeHigh.setText("@Action.Grid.OptimizeHeight");
 		btnOptimizeHigh.setEnabled(true);
-		createToolItem(bar, btnOptimizeHigh, grid.getId() + "." + btnOptimizeHigh.getId());
+		createToolItem(bar, btnOptimizeHigh);
 
 		Button btnOptimizeWidth = new Button();
-		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
+		btnOptimizeWidth.setId(grid.getId() + "." + Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
 		btnOptimizeWidth.setText("@Action.Grid.OptimizeWidth");
 		btnOptimizeWidth.setEnabled(true);
-		createToolItem(bar, btnOptimizeWidth, grid.getId() + "." + btnOptimizeWidth.getId());
+		createToolItem(bar, btnOptimizeWidth);
 
 		Button btnHorizontalFill = new Button();
-		btnHorizontalFill.setId(Constants.CONTROL_GRID_BUTTON_HORIZONTALFILL);
+		btnHorizontalFill.setId(grid.getId() + "." + Constants.CONTROL_GRID_BUTTON_HORIZONTALFILL);
 		btnHorizontalFill.setIcon("ResizeLayout.Command");
 		btnHorizontalFill.setText("@Action.Grid.HorizontalFill");
 		btnHorizontalFill.setEnabled(true);
-		createToolItem(bar, btnHorizontalFill, grid.getId() + "." + btnHorizontalFill.getId());
+		createToolItem(bar, btnHorizontalFill);
 
 		section.setTextClient(bar);
 	}
 
-	public ToolItem createToolItem(ToolBar bar, Button btn, String buttonID) {
-		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND, buttonID);
+	public Item createToolItem(ToolBar bar, Button btn) {
+		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND);
 	}
 
-	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName, String buttonID) {
-		final ToolItem item = new ToolItem(bar, SWT.PUSH);
-		item.setData(btn);
-		item.setData("org.eclipse.swtbot.widget.key", btn.getId());
-		item.setEnabled(btn.isEnabled());
-		if (btn.getText() != null) {
-			item.setToolTipText(translationService.translate(btn.getText(), null));
-			item.setData(FieldUtil.TRANSLATE_PROPERTY, btn.getText());
+	public Item createToolItem(ToolBar bar, Button btn, String commandName) {
+
+		ButtonAccessor toolItemInSection = createButtonUtil.createToolItemInSection(bar, btn);
+		Item item = toolItemInSection.getToolItem() != null ? toolItemInSection.getToolItem() : toolItemInSection.getMenuItem();
+
+		if (item instanceof MenuItem mi) {
+			mi.addSelectionListener(getSelectionAdapter(btn, commandName, item));
+		} else if (item instanceof ToolItem ti) {
+			ti.addSelectionListener(getSelectionAdapter(btn, commandName, item));
 		}
 
-		MButton mButton = new MButton(buttonID);
+		MButton mButton = new MButton(btn.getId());
 		mButton.setIcon(btn.getIcon());
 		mButton.setText(btn.getText());
-		ButtonAccessor bA = new ButtonAccessor(item);
-		mButton.setButtonAccessor(bA);
+		mButton.setButtonAccessor(toolItemInSection);
 		mDetail.putButton(mButton);
 
 		if (btn.getId().equals(Constants.CONTROL_GRID_BUTTON_DELETE)) {
-			deleteToolItemAccessor = bA;
-		}
-
-		item.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				// TODO: Andere procedures/bindings/instances auswerten
-				Map<String, String> parameter = new HashMap<>();
-				parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btn.getId());
-				parameter.put(Constants.CONTROL_GRID_ID, grid.getId());
-				ParameterizedCommand command = commandService.createCommand(commandName, parameter);
-				handlerService.executeHandler(command);
-			}
-		});
-
-		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon(), false);
-			Image buttonImage = resManager.createImage(buttonImageDescriptor);
-			item.setImage(buttonImage);
+			deleteToolItemAccessor = toolItemInSection;
 		}
 
 		return item;
+	}
+
+	private SelectionAdapter getSelectionAdapter(Button btn, String commandName, Item item) {
+		return new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				boolean isEnabled = false;
+				if (item instanceof MenuItem mi) {
+					isEnabled = mi.isEnabled();
+				} else if (item instanceof ToolItem ti) {
+					isEnabled = ti.isEnabled();
+				}
+				if (e.detail != SWT.ARROW && isEnabled) {
+					// TODO: Andere procedures/bindings/instances auswerten
+					Map<String, String> parameter = new HashMap<>();
+					parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btn.getId().replace(grid.getId() + ".", ""));
+					parameter.put(Constants.CONTROL_GRID_ID, grid.getId());
+					ParameterizedCommand command = commandService.createCommand(commandName, parameter);
+					handlerService.executeHandler(command);
+				}
+			}
+		};
 	}
 
 	public NatTable createNatTable() {

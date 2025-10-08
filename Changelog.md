@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Neu
+- Auch in Grids Buttons mit Dropdown ermöglichen
+
 ### Änderung
 - Aussagekräftiger Fehler, wenn Passwort im Login-Dialog null ist
 - Möglichkeit für Warnungs-Dialog

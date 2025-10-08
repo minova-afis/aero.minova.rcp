@@ -197,6 +197,7 @@ public class WFCDetailPart extends WFCFormPart {
 		mPerspective.getContext().set(DirtyFlagUtil.class, dirtyFlagUtil);
 
 		buttonUtil = ContextInjectionFactory.make(CreateButtonInDetailUtil.class, mPart.getContext());
+		mPerspective.getContext().set(CreateButtonInDetailUtil.class, buttonUtil);
 		buttonUtil.setMDetail(mDetail);
 		buttonUtil.setForm(form);
 

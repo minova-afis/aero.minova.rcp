@@ -129,4 +129,12 @@ public class ButtonAccessor implements IButtonAccessor {
 		return mButton;
 	}
 
+	public ToolItem getToolItem() {
+		return toolItem;
+	}
+
+	public MenuItem getMenuItem() {
+		return menuItem;
+	}
+
 }
