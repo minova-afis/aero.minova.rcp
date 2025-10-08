@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.16.0] - 08.10.2025
+
 ### Neu
 - Auch in Grids Buttons mit Dropdown ermöglichen
 
