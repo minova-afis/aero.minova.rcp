@@ -11,7 +11,7 @@
 
     <groupId>aero.minova.rcp</groupId>
     <artifactId>aero.minova.rcp.root</artifactId>
-    <version>12.15.1-SNAPSHOT</version>
+    <version>12.16.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>aero.minova.rcp</name>

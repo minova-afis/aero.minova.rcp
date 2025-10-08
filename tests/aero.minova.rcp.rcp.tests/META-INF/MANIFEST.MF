@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: aero.minova.rcp.rcp.tests
-Bundle-Version: 12.15.1.qualifier
+Bundle-Version: 12.16.0.qualifier
 Fragment-Host: aero.minova.rcp.rcp
 Automatic-Module-Name: aero.minova.rcp.rcp.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-17
