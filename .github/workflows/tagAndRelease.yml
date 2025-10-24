@@ -66,7 +66,7 @@ jobs:
     - name: Copy .zip und .tar.gz  to Stage area
       run: mkdir staging && cp releng/aero.minova.rcp.product/target/products/*.zip staging && cp releng/aero.minova.rcp.product/target/products/*.tar.gz staging
     - name: Upload .zip und .tar.gz 
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: aero.minova.rcp ${{ github.event.inputs.version }}
         path: staging
