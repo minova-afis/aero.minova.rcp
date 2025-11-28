@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Bugfixes
+- Grid korrekt aufbauen, auch wenn keine Statistik in der XBS konfiguriert ist
+
 ## [12.16.0] - 08.10.2025
 
 ### Neu

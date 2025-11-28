@@ -80,6 +80,12 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 		Node statisticNode = XBSUtil.getNodeWithName(preferences, STATISTIC);
+
+		if (statisticNode == null) {
+			logger.error("Statistic node not found in XBS preferences.");
+			return;
+		}
+
 		for (Node n : statisticNode.getNode()) {
 			Row row = RowBuilder.newRow().withValue("").withValue("").withValue("").withValue("").create();
 			row.setValue(new Value(n.getName()), 0);
