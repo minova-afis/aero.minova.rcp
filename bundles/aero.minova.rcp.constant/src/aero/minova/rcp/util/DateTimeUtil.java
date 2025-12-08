@@ -64,27 +64,28 @@ public class DateTimeUtil {
 		LocalDate dateLocal;
 		LocalTime timeLocal;
 
-		if (input.contains(" ")) {
-			splitInput = input.split(" ");
-		} else if (input.contains("*")) {
+		if (input.contains("*")) {
 			String first = input.substring(0, input.indexOf("*"));
 			String last = input.substring(input.lastIndexOf("*") + 1);
 			String firstLast = first + " " + last;
 			splitInput = firstLast.split(" ");
 		} else {
-			return null;
+			splitInput = input.split(" ");
 		}
 
-		if (splitInput.length > 1) {
-			if (!splitInput[0].isEmpty()) {
-				dateIn = DateUtil.getDate(todayNow, splitInput[0], locale, dateUtilPattern);
-				timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
-			} else {
-				dateIn = DateUtil.getDate(todayNow, "0", locale, dateUtilPattern);
-				timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
-			}
+		// Datum aus dem ersten Teil
+		if (!splitInput[0].isEmpty()) {
+			dateIn = DateUtil.getDate(todayNow, splitInput[0], locale, dateUtilPattern);
 		} else {
-			return null;
+			dateIn = DateUtil.getDate(todayNow, "0", locale, dateUtilPattern);
+		}
+
+		// Zeit aus dem zweiten Teil
+		if (splitInput.length > 1) {
+			timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
+		} else {
+			// Mitternacht, wenn nichts angegeben ist
+			timeIn = TimeUtil.getTime(todayNow, "00", timeUtilPattern);
 		}
 
 		if (null != dateIn && null != timeIn) {

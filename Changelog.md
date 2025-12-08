@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Änderung
+- In Date-Time Feldern reicht die Angabe des Datums nun aus (Zeit wird mit 00:00 vorbelegt, wenn nicht anders eingegeben)
+
 ### Bugfixes
 - Grid korrekt aufbauen, auch wenn keine Statistik in der XBS konfiguriert ist
 
