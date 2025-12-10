@@ -61,6 +61,12 @@ public class PrintDetailHandler {
 	@Inject
 	MApplication mApplication;
 
+	@Inject
+	private EModelService eModelService;
+
+	@Inject
+	private MPerspective mPerspective;
+
 	public static final String FORMS = "Forms";
 	public static final String DEFAULT = "DEFAULT";
 	public static final String PROCEDURENAME = "procedurename";
@@ -95,6 +101,9 @@ public class PrintDetailHandler {
 		} catch (Exception e) {}
 		File reportsFolder = dataService.getStoragePath().resolve("reports/").toFile();
 		reportsFolderExists = reportsFolder.exists();
+
+		// Beim Starten Vorschau schließen
+		PrintUtil.hidePreview(mPerspective, eModelService);
 	}
 
 	@CanExecute
