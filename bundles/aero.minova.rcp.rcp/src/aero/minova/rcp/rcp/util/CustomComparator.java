@@ -16,6 +16,8 @@ public class CustomComparator implements Comparator<Object> {
 		} else if (o2 == null) {
 			return 1;
 
+		} else if (o1 instanceof String s1 && o2 instanceof String s2) {
+			return s1.compareToIgnoreCase(s2); // Bei Strings Case ignorieren
 		} else if (o1 instanceof Comparable c1 && o2 instanceof Comparable c2 && //
 				c1.getClass().equals(c2.getClass())) { // Auch überprüfen, ob die Objekte die gleiche Klasse haben
 			return c1.compareTo(c2);

@@ -17,6 +17,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Änderung
 - In Date-Time Feldern reicht die Angabe des Datums nun aus (Zeit wird mit 00:00 vorbelegt, wenn nicht anders eingegeben)
 - Druckvorschau wird nach Start nicht anzeigen, auch wenn es sie vor dem Schließen der Anwendung geöffnet war
+- String-Index-Spalten Case-Insensitive sortieren 
 
 ### Bugfixes
 - Grid korrekt aufbauen, auch wenn keine Statistik in der XBS konfiguriert ist
