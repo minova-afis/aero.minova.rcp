@@ -140,6 +140,17 @@ public class PrintUtil {
 	}
 
 	/**
+	 * Blendet die Druckvorschau aus
+	 * 
+	 * @param mPerspective
+	 * @param modelService
+	 */
+	public static void hidePreview(MPerspective mPerspective, EModelService modelService) {
+		MPart previewPart = (MPart) modelService.find(Preview.PART_ID, mPerspective);
+		previewPart.setVisible(false);
+	}
+
+	/**
 	 * Öffnet entwender das BrowserWiget um den Index-Druck anzuzeigen oder den Default PDF Reader!
 	 *
 	 * @param urlString
