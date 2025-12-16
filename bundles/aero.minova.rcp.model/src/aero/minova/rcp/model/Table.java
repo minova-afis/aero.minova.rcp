@@ -34,7 +34,7 @@ public class Table {
 
 	public int getColumnIndex(String columnName) {
 		for (int i = 0; i < columns.size(); i++) {
-			if (columns.get(i).getName().equals(columnName)) {
+			if (columns.get(i).getName().equalsIgnoreCase(columnName)) {
 				return i;
 			}
 		}
@@ -43,7 +43,7 @@ public class Table {
 
 	public Column getColumn(String columnName) {
 		for (int i = 0; i < columns.size(); i++) {
-			if (columns.get(i).getName().equals(columnName)) {
+			if (columns.get(i).getName().equalsIgnoreCase(columnName)) {
 				return columns.get(i);
 			}
 		}
@@ -264,7 +264,7 @@ public class Table {
 			for (Column originalColumn : getColumns()) {
 
 				for (Column newColumn : rowsToAdd.getColumns()) {
-					if (originalColumn.getName().equals(newColumn.getName())) {
+					if (originalColumn.getName().equalsIgnoreCase(newColumn.getName())) {
 						Value v = rowInNewTable.getValue(rowsToAdd.getColumns().indexOf(newColumn));
 						int index = getColumns().indexOf(originalColumn);
 						rowInOriginal.setValue(v, index);
