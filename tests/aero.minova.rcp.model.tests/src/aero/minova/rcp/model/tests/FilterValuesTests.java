@@ -23,15 +23,27 @@ class FilterValuesTests {
 	}
 
 	@Test
-	void testSerializeInt() {
+	void testSerializePositiveInt() {
 		FilterValue fv = new FilterValue("=", 1234, "");
 		assertEquals("f-=-n-1234", ValueSerializer.serialize(fv).getAsString());
 	}
 
 	@Test
-	void testSerializeDouble() {
+	void testSerializeNegativeInt() {
+		FilterValue fv = new FilterValue("=", -1234, "");
+		assertEquals("f-=-n--1234", ValueSerializer.serialize(fv).getAsString());
+	}
+
+	@Test
+	void testSerializePositiveDouble() {
 		FilterValue fv = new FilterValue("=", 12.34, "");
 		assertEquals("f-=-d-12.34", ValueSerializer.serialize(fv).getAsString());
+	}
+
+	@Test
+	void testSerializeNegativeDouble() {
+		FilterValue fv = new FilterValue("=", -12.34, "");
+		assertEquals("f-=-d--12.34", ValueSerializer.serialize(fv).getAsString());
 	}
 
 	@Test
@@ -47,9 +59,15 @@ class FilterValuesTests {
 	}
 
 	@Test
-	void testSerializeBoolean() {
+	void testSerializeBooleanTrue() {
 		FilterValue fv = new FilterValue("=", true, "");
 		assertEquals("f-=-b-true", ValueSerializer.serialize(fv).getAsString());
+	}
+
+	@Test
+	void testSerializeBooleanFalse() {
+		FilterValue fv = new FilterValue("=", false, "");
+		assertEquals("f-=-b-false", ValueSerializer.serialize(fv).getAsString());
 	}
 
 	@Test
