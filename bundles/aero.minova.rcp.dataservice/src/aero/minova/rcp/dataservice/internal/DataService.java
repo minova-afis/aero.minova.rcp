@@ -90,6 +90,7 @@ public class DataService implements IDataService {
 	private static final String APPLICATION_JSON = "application/json";
 	private static final String CONTENT_TYPE = "Content-Type";
 	private static final String ACCEPT_ENCODING = "Accept-Encoding";
+	private static final String GZIP = "gzip";
 	private static final String ERROR = "Error";
 	private static final String USE_CACHE = "UseCache: ";
 	private static final String MESSAGE = "Message";
@@ -217,7 +218,7 @@ public class DataService implements IDataService {
 
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/index")) //
 				.header(CONTENT_TYPE, APPLICATION_JSON) //
-				.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+				.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 				.method("POST", BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
@@ -246,7 +247,7 @@ public class DataService implements IDataService {
 		String body = gson.toJson(procedureList);
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/x-procedure")) //
 				.header(CONTENT_TYPE, APPLICATION_JSON) //
-				.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+				.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
@@ -294,7 +295,7 @@ public class DataService implements IDataService {
 		String body = gson.toJson(table);
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve(DATA_PROCEDURE)) //
 				.header(CONTENT_TYPE, APPLICATION_JSON) //
-				.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+				.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
@@ -427,7 +428,7 @@ public class DataService implements IDataService {
 		String body = gson.toJson(table);
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve(DATA_PROCEDURE)) //
 				.header(CONTENT_TYPE, APPLICATION_JSON) //
-				.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+				.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * (long) 2)).build();
 
@@ -525,7 +526,7 @@ public class DataService implements IDataService {
 		String body = gson.toJson(table);
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve(DATA_PROCEDURE)) //
 				.header(CONTENT_TYPE, APPLICATION_JSON) //
-				.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+				.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * (long) 2)).build();
 
@@ -555,7 +556,7 @@ public class DataService implements IDataService {
 		String method = "File Async";
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("files/read?path=" + fileName))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+				.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 		Path localFile = getStoragePath().resolve(fileName);
 
@@ -645,7 +646,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<String> getServerHashForFile(String filename) {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("files/hash?path=" + filename))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+				.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
 		log("CAS Request Server Hash for File:\n" + request + "\n" + filename);
@@ -671,7 +672,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<String> getCASLabel() {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("label"))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+				.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
 		log("CAS Request Server Label:\n" + request);
@@ -944,7 +945,7 @@ public class DataService implements IDataService {
 			// Kein Timeout, da Upload länger dauer kann
 			HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("upload/logs"))//
 					.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM)//
-					.header(ACCEPT_ENCODING, "gzip") // Add the Accept-Encoding header
+					.header(ACCEPT_ENCODING, GZIP) // Add the Accept-Encoding header
 					.POST(BodyPublishers.ofByteArray(Files.readAllBytes(getStoragePath().resolve("logs.zip"))))//
 					.build();
 
