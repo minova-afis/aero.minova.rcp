@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Uitests
 Bundle-SymbolicName: aero.minova.rcp.uitests
-Bundle-Version: 12.16.0.qualifier
+Bundle-Version: 12.16.1.qualifier
 Automatic-Module-Name: aero.minova.rcp.uitests
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.osgi,

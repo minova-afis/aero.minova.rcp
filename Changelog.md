@@ -14,9 +14,12 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+
 ### Neu
 
 - "gzip" encoding akzeptieren
+
+## [12.16.1] - 17.12.2025
 
 ### Änderung
 - In Date-Time Feldern reicht die Angabe des Datums nun aus (Zeit wird mit 00:00 vorbelegt, wenn nicht anders eingegeben)
