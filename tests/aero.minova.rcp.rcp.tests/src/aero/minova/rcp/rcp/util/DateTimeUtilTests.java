@@ -37,8 +37,8 @@ class DateTimeUtilTests {
 	}
 
 	@Test
-	void ensureNullInput0WithoutHourInput() {
-		assertNull(DateTimeUtil.getDateTime(initialDay, "0"));
+	void ensureInput0WithoutHourInput() {
+		assertEquals(LocalDate.of(1967, MAY, 23).atStartOfDay().toInstant(ZoneOffset.UTC), DateTimeUtil.getDateTime(initialDay, "0"));
 	}
 
 	@Test
@@ -58,8 +58,8 @@ class DateTimeUtilTests {
 	}
 
 	@Test
-	void ensureNullInput1WithoutHourInput() {
-		assertNull(DateTimeUtil.getDateTime(initialDay, "1"));
+	void ensureInput1WithoutHourInput() {
+		assertEquals(LocalDate.of(1967, MAY, 1).atStartOfDay().toInstant(ZoneOffset.UTC), DateTimeUtil.getDateTime(initialDay, "1"));
 	}
 
 	@Test
@@ -75,8 +75,8 @@ class DateTimeUtilTests {
 	}
 
 	@Test
-	void ensureNullInput11WithoutHourInput() {
-		assertNull(DateTimeUtil.getDateTime(initialDay, "11"));
+	void ensureInput11WithoutHourInput() {
+		assertEquals(LocalDate.of(1967, JANUARY, 1).atStartOfDay().toInstant(ZoneOffset.UTC), DateTimeUtil.getDateTime(initialDay, "11"));
 	}
 
 	@Test
@@ -128,8 +128,8 @@ class DateTimeUtilTests {
 	}
 
 	@Test
-	void ensureNullInput90412WithoutHourInput() {
-		assertNull(DateTimeUtil.getDateTime(initialDay, "90412"));
+	void ensureInput90412WithoutHourInput() {
+		assertEquals(LocalDate.of(1912, APRIL, 9).atStartOfDay().toInstant(ZoneOffset.UTC), DateTimeUtil.getDateTime(initialDay, "90412"));
 	}
 
 	@Test
@@ -145,8 +145,8 @@ class DateTimeUtilTests {
 	}
 
 	@Test
-	void ensureNullWithInput13121865WithoutHourInput() {
-		assertNull(DateTimeUtil.getDateTime(initialDay, "13121865"));
+	void ensureWithInput13121865WithoutHourInput() {
+		assertEquals(LocalDate.of(1865, DECEMBER, 13).atStartOfDay().toInstant(ZoneOffset.UTC), DateTimeUtil.getDateTime(initialDay, "13121865"));
 	}
 
 	@Test
@@ -196,8 +196,8 @@ class DateTimeUtilTests {
 	}
 
 	@Test
-	void ensureNullWithInputEmptyString() {
-		assertNull(DateTimeUtil.getDateTime(initialDay, ""));
+	void ensureWithInputEmptyString() {
+		assertEquals(LocalDate.of(1967, MAY, 23).atStartOfDay().toInstant(ZoneOffset.UTC), DateTimeUtil.getDateTime(initialDay, ""));
 	}
 
 	@Test
@@ -220,9 +220,9 @@ class DateTimeUtilTests {
 	}
 
 	@Test
-	void ensureNullWithInput1Point1() {
+	void ensureWithInput1Point1() {
 		Instant initialDay = LocalDate.of(1967, MAY, 23).atStartOfDay().toInstant(ZoneOffset.UTC);
-		assertNull(DateTimeUtil.getDateTime(initialDay, "1.1"));
+		assertEquals(LocalDate.of(1967, JANUARY, 1).atStartOfDay().toInstant(ZoneOffset.UTC), DateTimeUtil.getDateTime(initialDay, "1.1"));
 	}
 
 	@Test
