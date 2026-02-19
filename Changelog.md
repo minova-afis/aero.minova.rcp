@@ -19,6 +19,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 - "gzip" encoding akzeptieren
 
+### Bugfixes
+- Verhindern, das bei Klick auf "Optimieren" das Detail zu breit wird und die Suche/Index komplett verschwindet
+
 ## [12.16.1] - 17.12.2025
 
 ### Änderung
