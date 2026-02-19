@@ -33,9 +33,15 @@ public class OptimizeDetailHandler {
 		DetailLayout detailLayout = (DetailLayout) mPerspective.getContext().get(Constants.DETAIL_LAYOUT);
 		int prefDetailWidth = detailLayout.layout(detailComposite, false, detailComposite.getSize().x, false, false).x;
 
-		int size = 100000;
+		int size = 1000;
 		float detailSize = (float) (prefDetailWidth + 35.0) / mwindow.getWidth();
 		float leftSize = 1.0f - detailSize;
+
+		// Falls das Detail zu breit ist, wird es auf 85% begrenzt. Das verhindert, dass die linke Seite zu schmal wird oder ganz aus dem Bild verschwindet
+		if (detailSize > 0.85f) {
+			detailSize = 0.85f;
+			leftSize = 0.15f;
+		}
 
 		MPartSashContainer element = emservice
 				.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partsashcontainer.main", MPartSashContainer.class).get(0);
