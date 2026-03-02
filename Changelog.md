@@ -14,6 +14,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.17.0] - 02.03.2026
 
 ### Neu
 
