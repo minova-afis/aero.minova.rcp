@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+### Bugfixes
+- Eingestelltes Locale für Integers im Index anwenden
+
 ## [12.17.0] - 02.03.2026
 
 ### Neu

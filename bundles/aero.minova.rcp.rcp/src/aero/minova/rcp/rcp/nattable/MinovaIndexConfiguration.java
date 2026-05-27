@@ -213,7 +213,10 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 
-		NumberFormat nf = NumberFormat.getInstance();
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
+		NumberFormat nf = NumberFormat.getInstance(locale);
 		DefaultIntegerDisplayConverter defaultIntegerDisplayConverter = new DefaultIntegerDisplayConverter(true);
 		defaultIntegerDisplayConverter.setNumberFormat(nf);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultIntegerDisplayConverter, DisplayMode.NORMAL,
