@@ -2,6 +2,7 @@ package aero.minova.rcp.util;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.Locale;
 
@@ -30,8 +31,8 @@ public class Tools {
 				if (url.toLowerCase(Locale.ENGLISH).startsWith("http") || url.toLowerCase(Locale.ENGLISH).startsWith("www")
 						|| url.toLowerCase(Locale.ENGLISH).startsWith("file:/")) {
 					// Browser
-					final URL toBrowse = new URL(url);
-					Desktop.getDesktop().browse(toBrowse.toURI());
+					final URI toBrowse = new URL(new URL(url).toURI().toASCIIString()).toURI();
+					Desktop.getDesktop().browse(toBrowse);
 				} else {
 					// Datei öffnen
 					final File f = new File(url);
