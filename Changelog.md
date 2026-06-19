@@ -14,6 +14,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.17.2] - 19.06.2026
 
 ### Bugfixes
 - Dateien mit Umlauten in externen Programmen öffnen
