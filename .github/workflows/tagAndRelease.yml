@@ -88,7 +88,7 @@ jobs:
         prerelease: false
       
     # .zips zum Release hinzufügen  
-    - name: Upload windows zip as Release Asset
+    - name: Upload windows as Release Asset
       id: upload-release-asset-win
       uses: actions/upload-release-asset@v1
       env:
@@ -99,7 +99,7 @@ jobs:
         asset_name: FreeTables_Windows_${{ github.event.inputs.version }}.zip
         asset_content_type: application/.zip
    # Mac funktioniert noch nicht aus dem Internet zu laden, siehe #273
-   # - name: Upload Mac zip as Release Asset
+   # - name: Upload Mac (Intel) as Release Asset
    #   id: upload-release-asset-mac
    #   uses: actions/upload-release-asset@v1
    #   env:
@@ -107,9 +107,19 @@ jobs:
    #   with:
    #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
    #     asset_path: staging/FreeTables-macosx.cocoa.x86_64.tar.gz
-   #     asset_name: FreeTables_macOS_${{ github.event.inputs.version }}.tar.gz
+   #     asset_name: FreeTables_macOS_x86_64_${{ github.event.inputs.version }}.tar.gz
    #     asset_content_type: application/tar.gz
-    - name: Upload Linux zip as Release Asset
+   # - name: Upload Mac (Apple Silicon) as Release Asset
+   #   id: upload-release-asset-mac-aarch64
+   #   uses: actions/upload-release-asset@v1
+   #   env:
+   #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+   #   with:
+   #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+   #     asset_path: staging/FreeTables-macosx.cocoa.aarch64.tar.gz
+   #     asset_name: FreeTables_macOS_aarch64_${{ github.event.inputs.version }}.tar.gz
+   #     asset_content_type: application/tar.gz
+    - name: Upload Linux as Release Asset
       id: upload-release-asset-linux
       uses: actions/upload-release-asset@v1
       env:
