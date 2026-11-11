@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## Unreleased
 
+## [12.18.0] - 11.10.2026
+
 ### Neu
 - Die macOS-Version wird jetzt zusätzlich für Apple-Chips (Apple Silicon, aarch64) gebaut. Die Intel-Version (x86_64) bleibt weiterhin bestehen.
   - Welche Version verwendet werden muss, lässt sich am eigenen Mac prüfen: Menü  → "Über diesen Mac". Steht dort unter "Chip" ein Apple-Chip (M1, M2, M3, ...), wird die Version `macosx.cocoa.aarch64` benötigt. Steht dort "Prozessor" mit Intel, wird die Version `macosx.cocoa.x86_64` benötigt.
